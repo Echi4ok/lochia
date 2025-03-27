@@ -19,6 +19,7 @@
     "vuetify": "^3.7.16"
   },
   "devDependencies": {
+    "@originjs/vite-plugin-federation": "^1.4.0",
     "@tailwindcss/postcss": "^4.0.14",
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.13.9",

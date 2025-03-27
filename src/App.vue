@@ -5,15 +5,12 @@ import Footer from "./components/Footer.vue";
 
 <template>
   <div class="app flex flex-col min-h-screen bg-gray-50">
-    <!-- Header -->
     <Header />
 
-    <!-- Main Content -->
     <main class="main-content flex-grow container mx-auto px-4 py-8">
       <router-view></router-view>
     </main>
 
-    <!-- Footer -->
     <Footer />
   </div>
 </template>

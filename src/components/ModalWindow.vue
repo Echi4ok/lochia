@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed} from 'vue'
+import {computed, ref} from 'vue'
 import { useCandidatesStore, type Candidate } from '@/stores/candidates';
 
 interface Props {
@@ -16,74 +16,204 @@ const candidate = computed(() => {
         return t.id === props.candidateId
     })
 })
+
+const isEdit = ref<boolean>(true);
+
+const editMode = () => {
+  isEdit.value = false;
+  console.log(isEdit.value)
+}
 </script>
 
 <template>
-    <div v-if="candidate" class="fixed inset-0 flex items-center justify-center bg-opacity-50">
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6">
-        <!-- Заголовок модального окна -->
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-bold text-purple-800">Информация о кандидате</h2>
-          <button @click="props.isShowingWindow()" class="text-gray-500 hover:text-gray-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-  
-        <!-- Основная информация -->
-        <div class="space-y-4">
-          <div class="flex items-center">
-            <span class="font-semibold text-gray-700 w-32">Имя:</span>
-            <span class="text-gray-900">{{ candidate.name }}</span>
+  <div 
+    v-if="candidate" 
+    class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
+    @click.self="props.isShowingWindow()"
+  >
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
+      <!-- Заголовок модального окна -->
+      <div class="sticky top-0 bg-white z-10 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-800">
+          {{ isEdit ? 'Информация о кандидате' : 'Редактирование кандидата' }}
+        </h2>
+        <button 
+          @click="props.isShowingWindow()" 
+          class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Основной контент -->
+      <div class="p-6 space-y-5">
+        <!-- Режим просмотра -->
+        <template v-if="isEdit">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-500">Имя</p>
+              <p class="text-gray-900">{{ candidate.name }}</p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-500">Должность</p>
+              <p class="text-gray-900">{{ candidate.position }}</p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-500">Образование</p>
+              <p class="text-gray-900">{{ candidate.education }}</p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-500">Навыки</p>
+              <p class="text-gray-900">{{ candidate.skills }}</p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-500">Опыт</p>
+              <p class="text-gray-900">{{ candidate.experience }}</p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-500">Часов в неделю</p>
+              <p class="text-gray-900">{{ candidate.hoursPerWeek }}</p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-500">Тип занятости</p>
+              <p class="text-gray-900 capitalize">{{ candidate.employmentType }}</p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-500">Email</p>
+              <a :href="`mailto:${candidate.email}`" class="text-blue-600 hover:underline">{{ candidate.email }}</a>
+            </div>
+            <div class="space-y-1">
+              <p class="text-sm font-medium text-gray-500">Телефон</p>
+              <a :href="`tel:${candidate.phone}`" class="text-blue-600 hover:underline">{{ candidate.phone }}</a>
+            </div>
           </div>
-          <div class="flex items-center">
-            <span class="font-semibold text-gray-700 w-32">Должность:</span>
-            <span class="text-gray-900">{{ candidate.position }}</span>
+        </template>
+
+        <!-- Режим редактирования -->
+        <template v-else>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Имя</label>
+              <input
+                type="text"
+                v-model="candidate.name"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              >
+            </div>
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Должность</label>
+              <input
+                type="text"
+                v-model="candidate.position"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              >
+            </div>
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Образование</label>
+              <input
+                type="text"
+                v-model="candidate.education"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              >
+            </div>
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Навыки</label>
+              <input
+                type="text"
+                v-model="candidate.skills"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              >
+            </div>
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Опыт</label>
+              <input
+                type="text"
+                v-model="candidate.experience"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              >
+            </div>
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Часов в неделю</label>
+              <input
+                type="number"
+                v-model="candidate.hoursPerWeek"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              >
+            </div>
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Тип занятости</label>
+              <select
+                v-model="candidate.employmentType"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              >
+                <option value="очно">Очно</option>
+                <option value="удаленно">Удаленно</option>
+                <option value="гибрид">Гибрид</option>
+              </select>
+            </div>
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                v-model="candidate.email"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              >
+            </div>
+            <div class="space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Телефон</label>
+              <input
+                type="tel"
+                v-model="candidate.phone"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              >
+            </div>
           </div>
-          <div class="flex items-center">
-            <span class="font-semibold text-gray-700 w-32">Образование:</span>
-            <span class="text-gray-900">{{ candidate.education }}</span>
-          </div>
-          <div class="flex items-center">
-            <span class="font-semibold text-gray-700 w-32">Навыки:</span>
-            <span class="text-gray-900">{{ candidate.skills }}</span>
-          </div>
-          <div class="flex items-center">
-            <span class="font-semibold text-gray-700 w-32">Опыт:</span>
-            <span class="text-gray-900">{{ candidate.experience }}</span>
-          </div>
-          <div class="flex items-center">
-            <span class="font-semibold text-gray-700 w-32">Часов в неделю:</span>
-            <span class="text-gray-900">{{ candidate.hoursPerWeek }}</span>
-          </div>
-          <div class="flex items-center">
-            <span class="font-semibold text-gray-700 w-32">Тип занятости:</span>
-            <span class="text-gray-900">{{ candidate.employmentType }}</span>
-          </div>
-          <div class="flex items-center">
-            <span class="font-semibold text-gray-700 w-32">Email:</span>
-            <span class="text-gray-900">{{ candidate.email }}</span>
-          </div>
-          <div class="flex items-center">
-            <span class="font-semibold text-gray-700 w-32">Телефон:</span>
-            <span class="text-gray-900">{{ candidate.phone }}</span>
-          </div>
-        </div>
-  
-        <!-- Кнопка закрытия -->
-        <div class="mt-6 flex justify-end">
+        </template>
+      </div>
+
+      <!-- Футер с кнопками -->
+      <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end space-x-3">
+        <template v-if="isEdit">
           <button
-            @click="props.isShowingWindow()"
-            class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+            @click="editMode()"
+            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm flex items-center"
           >
-            Закрыть
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Редактировать
           </button>
-        </div>
+          <button
+            @click="candidateStore.deleteCandidate(candidate.id)"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Удалить
+          </button>
+        </template>
+        <template v-else>
+          <button
+            @click="editMode()"
+            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow-sm"
+          >
+            Отмена
+          </button>
+          <button
+            @click=""
+            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Сохранить
+          </button>
+        </template>
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
-<style scoped>
-  
-</style>
