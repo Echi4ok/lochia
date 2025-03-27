@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
@@ -39,6 +39,6 @@ export const useCandidatesStore = defineStore('candidates', () => {
     })
   }
 
-
+  onMounted(getCandidates)
   return { getCandidates, candidatesArr, deleteCandidate }
 })

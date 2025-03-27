@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { useCandidatesStore } from '@/stores/candidates';
+// import { useCandidatesStore, type Candidate } from '@/stores/candidates';
 import { onMounted, ref } from 'vue';
 import ModalWindow from './ModalWindow.vue';
-
-const candidatesStore = useCandidatesStore();
-
+import type { Item } from '../types/types';
+// // const candidatesStore = useCandidatesStore();
+const props = defineProps<{
+  items: Item[],
+}>();
+// const props = defineProps<Props>();
 let isOpenMenu = ref<boolean>(false);
-let candidateId = ref<number>();
+let itemId = ref<number>();
 
 const showId = (id: number) => {
-    candidateId.value = id;
+    itemId.value = id;
     isShowingWindow();
 }
 
@@ -17,7 +20,7 @@ const isShowingWindow = () => {
     isOpenMenu.value = !isOpenMenu.value;
 }
 
-onMounted(candidatesStore.getCandidates);
+
 </script>
 
 <template>
@@ -33,7 +36,7 @@ onMounted(candidatesStore.getCandidates);
 
     <!-- Таблица -->
     <div class="table-container border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-      <ModalWindow v-if="isOpenMenu" :candidateId="candidateId" :isShowingWindow="isShowingWindow"/>
+      <ModalWindow v-if="isOpenMenu && itemId !== undefined" :itemId="itemId" :items="props.items" :isShowingWindow="isShowingWindow"/>
       <table class="w-full">
         <!-- Заголовки таблицы -->
         <thead class="bg-gray-50">
@@ -54,23 +57,23 @@ onMounted(candidatesStore.getCandidates);
         <!-- Данные таблицы -->
         <tbody class="bg-white divide-y divide-gray-200">
           <tr 
-            v-for="candidate in candidatesStore.candidatesArr" 
-            :key="candidate.id" 
-            @click="showId(candidate.id)"
+            v-for="item in props.items" 
+            :key="item.id" 
+            @click="showId(item.id)"
             class="hover:bg-gray-50 cursor-pointer transition-colors"
           >
-            <td class="px-4 py-3 text-sm font-medium text-gray-900 truncate">{{ candidate.name }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ candidate.position }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ candidate.education }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ candidate.skills }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 text-center">{{ candidate.experience }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 text-center">{{ candidate.hoursPerWeek }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 capitalize">{{ candidate.employmentType }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ candidate.email }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600">{{ candidate.phone }}</td>
+            <td class="px-4 py-3 text-sm font-medium text-gray-900 truncate">{{ item.name }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.position }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.education }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.skills }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 text-center">{{ item.experience }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 text-center">{{ item.hoursPerWeek }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 capitalize">{{ item.employmentType }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.email }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">{{ item.phone }}</td>
             <td class="px-4 py-3 text-sm text-center">
               <a 
-                :href="candidate.resume" 
+                :href="item.resume" 
                 target="_blank"
                 class="text-purple-600 hover:text-purple-800"
                 @click.stop

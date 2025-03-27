@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue'
 import { useCandidatesStore, type Candidate } from '@/stores/candidates';
+import type { Item } from '../types/types';
 
-interface Props {
-  candidateId: number | undefined;
-  isShowingWindow: Function;
-}
 
 const candidateStore = useCandidatesStore();
-const props = defineProps<Props>();
+const props = defineProps<{
+  itemId: number;
+  isShowingWindow: Function;
+  items: Item[],
+}>();
 
-const candidate = computed(() => {
-    if(props.candidateId === undefined) return alert('ID кандидата не найден')
-    else return candidateStore.candidatesArr.find((t) => {
-        return t.id === props.candidateId
+const item = computed(() => {
+    if(props.itemId === undefined) return alert("ID не найден")
+    else return props.items.find((t) => { 
+        return t.id === props.itemId
     })
+
 })
 
 const isEdit = ref<boolean>(true);
@@ -27,7 +29,7 @@ const editMode = () => {
 
 <template>
   <div 
-    v-if="candidate" 
+    v-if="item" 
     class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
     @click.self="props.isShowingWindow()"
   >
@@ -54,39 +56,39 @@ const editMode = () => {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Имя</p>
-              <p class="text-gray-900">{{ candidate.name }}</p>
+              <p class="text-gray-900">{{ item.name }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Должность</p>
-              <p class="text-gray-900">{{ candidate.position }}</p>
+              <p class="text-gray-900">{{ item.position }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Образование</p>
-              <p class="text-gray-900">{{ candidate.education }}</p>
+              <p class="text-gray-900">{{ item.education }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Навыки</p>
-              <p class="text-gray-900">{{ candidate.skills }}</p>
+              <p class="text-gray-900">{{ item.skills }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Опыт</p>
-              <p class="text-gray-900">{{ candidate.experience }}</p>
+              <p class="text-gray-900">{{ item.experience }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Часов в неделю</p>
-              <p class="text-gray-900">{{ candidate.hoursPerWeek }}</p>
+              <p class="text-gray-900">{{ item.hoursPerWeek }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Тип занятости</p>
-              <p class="text-gray-900 capitalize">{{ candidate.employmentType }}</p>
+              <p class="text-gray-900 capitalize">{{ item.employmentType }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Email</p>
-              <a :href="`mailto:${candidate.email}`" class="text-blue-600 hover:underline">{{ candidate.email }}</a>
+              <a :href="`mailto:${item.email}`" class="text-blue-600 hover:underline">{{ item.email }}</a>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Телефон</p>
-              <a :href="`tel:${candidate.phone}`" class="text-blue-600 hover:underline">{{ candidate.phone }}</a>
+              <a :href="`tel:${item.phone}`" class="text-blue-600 hover:underline">{{ item.phone }}</a>
             </div>
           </div>
         </template>
@@ -98,7 +100,7 @@ const editMode = () => {
               <label class="block text-sm font-medium text-gray-700">Имя</label>
               <input
                 type="text"
-                v-model="candidate.name"
+                v-model="item.name"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -106,7 +108,7 @@ const editMode = () => {
               <label class="block text-sm font-medium text-gray-700">Должность</label>
               <input
                 type="text"
-                v-model="candidate.position"
+                v-model="item.position"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -114,7 +116,7 @@ const editMode = () => {
               <label class="block text-sm font-medium text-gray-700">Образование</label>
               <input
                 type="text"
-                v-model="candidate.education"
+                v-model="item.education"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -122,7 +124,7 @@ const editMode = () => {
               <label class="block text-sm font-medium text-gray-700">Навыки</label>
               <input
                 type="text"
-                v-model="candidate.skills"
+                v-model="item.skills"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -130,7 +132,7 @@ const editMode = () => {
               <label class="block text-sm font-medium text-gray-700">Опыт</label>
               <input
                 type="text"
-                v-model="candidate.experience"
+                v-model="item.experience"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -138,14 +140,14 @@ const editMode = () => {
               <label class="block text-sm font-medium text-gray-700">Часов в неделю</label>
               <input
                 type="number"
-                v-model="candidate.hoursPerWeek"
+                v-model="item.hoursPerWeek"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
             <div class="space-y-1">
               <label class="block text-sm font-medium text-gray-700">Тип занятости</label>
               <select
-                v-model="candidate.employmentType"
+                v-model="item.employmentType"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
                 <option value="очно">Очно</option>
@@ -157,7 +159,7 @@ const editMode = () => {
               <label class="block text-sm font-medium text-gray-700">Email</label>
               <input
                 type="email"
-                v-model="candidate.email"
+                v-model="item.email"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -165,7 +167,7 @@ const editMode = () => {
               <label class="block text-sm font-medium text-gray-700">Телефон</label>
               <input
                 type="tel"
-                v-model="candidate.phone"
+                v-model="item.phone"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -186,7 +188,7 @@ const editMode = () => {
             Редактировать
           </button>
           <button
-            @click="candidateStore.deleteCandidate(candidate.id)"
+            @click="candidateStore.deleteCandidate(item.id)"
             class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm flex items-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
