@@ -1,13 +1,13 @@
 <script setup lang="ts">
-// import { useCandidatesStore, type Candidate } from '@/stores/candidates';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import ModalWindow from './ModalWindow.vue';
-import type { Item } from '../types/types';
-// // const candidatesStore = useCandidatesStore();
+import type { Intern, Candidate } from '../types/types';
+
 const props = defineProps<{
-  items: Item[],
+  items: Intern[] | Candidate[],
+  storeType: "internship" | "candidate", 
 }>();
-// const props = defineProps<Props>();
+
 let isOpenMenu = ref<boolean>(false);
 let itemId = ref<number>();
 
@@ -36,7 +36,12 @@ const isShowingWindow = () => {
 
     <!-- Таблица -->
     <div class="table-container border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-      <ModalWindow v-if="isOpenMenu && itemId !== undefined" :itemId="itemId" :items="props.items" :isShowingWindow="isShowingWindow"/>
+      <ModalWindow v-if="isOpenMenu && itemId !== undefined"
+      :itemId="itemId" 
+      :items="props.items" 
+      :isShowingWindow="isShowingWindow" 
+      :storeType="props.storeType"
+      />
       <table class="w-full">
         <!-- Заголовки таблицы -->
         <thead class="bg-gray-50">

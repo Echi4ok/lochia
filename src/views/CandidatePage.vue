@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Table from '@/components/Table.vue';
-import { useCandidatesStore, type Candidate } from '@/stores/candidates';
+import { useCandidatesStore} from '@/stores/candidates';
 
 const candidatesStore = useCandidatesStore();
 
@@ -9,7 +9,7 @@ const candidatesStore = useCandidatesStore();
 
 <template>
   <div>
-    <Table :items = "candidatesStore.candidatesArr"/>
+    <Table :items = "candidatesStore.candidatesArr" store-type="candidate"/>
   </div>
 </template>
 

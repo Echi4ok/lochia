@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue'
-import { useCandidatesStore, type Candidate } from '@/stores/candidates';
+import {computed, ref, reactive} from 'vue'
+import { useCandidatesStore } from '@/stores/candidates';
+import { useInternStore } from '@/stores/internships';
 import type { Item } from '../types/types';
 
 
 const candidateStore = useCandidatesStore();
+const internshipStrore = useInternStore();
 const props = defineProps<{
-  itemId: number;
-  isShowingWindow: Function;
-  items: Item[],
+  itemId: number, // айди чела на которого кликнули
+  isShowingWindow: Function,
+  items: Item[], // массив канидадтов либо стажеров
+  storeType: "internship" | "candidate", 
 }>();
 
 const item = computed(() => {
@@ -16,14 +19,34 @@ const item = computed(() => {
     else return props.items.find((t) => { 
         return t.id === props.itemId
     })
-
 })
 
-const isEdit = ref<boolean>(true);
+
+const isEdit = ref<boolean>(false);
+
+const copyItemObj = reactive({...item.value});
 
 const editMode = () => {
+  isEdit.value = true;
+
+  console.log(copyItemObj)
+}
+
+const cancelEdit = () => {
   isEdit.value = false;
-  console.log(isEdit.value)
+  if (item.value) { 
+    Object.assign(item.value, copyItemObj);
+  }
+}
+
+const saveEdit = () => {
+  isEdit.value = false;
+  
+  if(props.storeType == "candidate") {
+    candidateStore.patchCandidate(props.itemId, {...item.value})
+  } else {
+    internshipStrore.patchIntern(props.itemId, {...item.value})
+  }
 }
 </script>
 
@@ -37,7 +60,7 @@ const editMode = () => {
       <!-- Заголовок модального окна -->
       <div class="sticky top-0 bg-white z-10 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-800">
-          {{ isEdit ? 'Информация о кандидате' : 'Редактирование кандидата' }}
+          {{ isEdit ? 'Редактирование кандидата' : 'Информация о кандидате' }}
         </h2>
         <button 
           @click="props.isShowingWindow()" 
@@ -52,7 +75,7 @@ const editMode = () => {
       <!-- Основной контент -->
       <div class="p-6 space-y-5">
         <!-- Режим просмотра -->
-        <template v-if="isEdit">
+        <template v-if="!isEdit">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Имя</p>
@@ -177,7 +200,7 @@ const editMode = () => {
 
       <!-- Футер с кнопками -->
       <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end space-x-3">
-        <template v-if="isEdit">
+        <template v-if="!isEdit">
           <button
             @click="editMode()"
             class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm flex items-center"
@@ -199,13 +222,13 @@ const editMode = () => {
         </template>
         <template v-else>
           <button
-            @click="editMode()"
+            @click="cancelEdit()"
             class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors shadow-sm"
           >
             Отмена
           </button>
           <button
-            @click=""
+            @click="saveEdit()"
             class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm flex items-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
