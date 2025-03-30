@@ -24,7 +24,7 @@ const item = computed(() => {
 
 const isEdit = ref<boolean>(false);
 
-const copyItemObj = reactive({...item.value});
+const copyItemObj = reactive<object>({...item.value});
 
 const editMode = () => {
   isEdit.value = true;

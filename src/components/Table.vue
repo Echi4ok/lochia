@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import ModalWindow from './ModalWindow.vue';
+import Search from './Search.vue';
 import type { Intern, Candidate } from '../types/types';
 
 const props = defineProps<{
@@ -10,6 +11,11 @@ const props = defineProps<{
 
 let isOpenMenu = ref<boolean>(false);
 let itemId = ref<number>();
+const displayedItems = ref<Intern[] | Candidate[]>([]);
+
+watch(() => props.items, () => {
+  displayedItems.value = [...props.items]
+})
 
 const showId = (id: number) => {
     itemId.value = id;
@@ -21,18 +27,18 @@ const isShowingWindow = () => {
 }
 
 
+
+const handleUpdatedItems = (newItems: any) => {
+  displayedItems.value = [...newItems]
+  console.log(newItems)
+}
+
 </script>
 
 <template>
   <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
     <!-- Поисковая строка -->
-    <div class="search-container mb-4">
-      <input
-        type="text"
-        placeholder="Поиск по кандидатам..."
-        class="search-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
-      />
-    </div>
+    <Search :storeType="storeType" :items="props.items" @updatedItems="handleUpdatedItems"/>
 
     <!-- Таблица -->
     <div class="table-container border border-gray-200 rounded-lg overflow-hidden shadow-sm">

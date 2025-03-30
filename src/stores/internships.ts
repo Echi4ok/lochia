@@ -49,7 +49,19 @@ export const useInternStore = defineStore('interns', () => {
     })
   }
 
+  function getSearch (params: object) {
+    axios.get(`https://c81b66adafc63de9.mokky.dev/internship`, {
+      params
+    })
+    .then((res) => {
+      console.log(res);
+      internsArr.value = res.data;
+    }).catch((e) => {
+      console.log("Error")
+    })
+  }
+
 
     onMounted(getInterns);
-  return { getInterns, internsArr, deleteInterns, patchIntern }
+  return { getInterns, internsArr, deleteInterns, patchIntern, getSearch }
 })
