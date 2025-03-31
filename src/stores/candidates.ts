@@ -30,9 +30,9 @@ export const useCandidatesStore = defineStore('candidates', () => {
   }
 
   function deleteCandidate (id : number) {
-    axios.delete(`https://44f1275207c2a7d3.mokky.dev/candidates${id}`)
+    axios.delete(`https://44f1275207c2a7d3.mokky.dev/candidates/${id}`)
     .then((res) => {
-      console.log(res)
+      alert('Успешно удалено')
       getCandidates();
     }).catch((e) => {
       console.log("Error")

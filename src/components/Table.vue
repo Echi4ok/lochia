@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import ModalWindow from './ModalWindow.vue';
 import Search from './Search.vue';
 import type { Intern, Candidate } from '../types/types';
+import { useCandidatesStore } from '@/stores/candidates';
+import { useInternStore } from '@/stores/internships';
+import {type Item } from '../types/types';
+
+const candidateStore = useCandidatesStore();
+const internshipStore = useInternStore();
 
 const props = defineProps<{
   items: Intern[] | Candidate[],
@@ -12,9 +18,24 @@ const props = defineProps<{
 let isOpenMenu = ref<boolean>(false);
 let itemId = ref<number>();
 const displayedItems = ref<Intern[] | Candidate[]>([]);
+  const createdItem = reactive({
+  name: '',
+  position: '',
+  education: '',
+  skills: '',
+  experience: '',
+  hoursPerWeek: +7123444888,
+  employmentType: '',
+  email: '',
+  phone: '',
+  resume: '',
+}); // добавить нового кандидата
 
+displayedItems.value = props.items
+
+console.log(displayedItems.value)
 watch(() => props.items, () => {
-  displayedItems.value = [...props.items]
+  displayedItems.value = props.items
 })
 
 const showId = (id: number) => {
@@ -26,19 +47,40 @@ const isShowingWindow = () => {
     isOpenMenu.value = !isOpenMenu.value;
 }
 
-
-
 const handleUpdatedItems = (newItems: any) => {
   displayedItems.value = [...newItems]
-  console.log(newItems)
 }
+
+const createNewItem = () => {
+  if(props.storeType == 'candidate') {
+    
+  } else if (props.storeType == 'internship') {
+    internshipStore.postIntern(createdItem);
+
+  }
+
+}
+
+
 
 </script>
 
 <template>
   <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
     <!-- Поисковая строка -->
-    <Search :storeType="storeType" :items="props.items" @updatedItems="handleUpdatedItems"/>
+    <div class="flex items-center justify-between mb-4">
+      <button
+        @click="createNewItem()"
+        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm flex items-center"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Добавить кандидата
+      </button>
+      
+      <Search :storeType="storeType" :items="props.items" @updatedItems="handleUpdatedItems"/>
+    </div>
 
     <!-- Таблица -->
     <div class="table-container border border-gray-200 rounded-lg overflow-hidden shadow-sm">
@@ -68,7 +110,7 @@ const handleUpdatedItems = (newItems: any) => {
         <!-- Данные таблицы -->
         <tbody class="bg-white divide-y divide-gray-200">
           <tr 
-            v-for="item in props.items" 
+            v-for="item in displayedItems" 
             :key="item.id" 
             @click="showId(item.id)"
             class="hover:bg-gray-50 cursor-pointer transition-colors"

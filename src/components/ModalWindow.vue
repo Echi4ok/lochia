@@ -3,6 +3,7 @@ import {computed, ref, reactive} from 'vue'
 import { useCandidatesStore } from '@/stores/candidates';
 import { useInternStore } from '@/stores/internships';
 import type { Item } from '../types/types';
+import { storeToRefs } from 'pinia';
 
 
 const candidateStore = useCandidatesStore();
@@ -23,8 +24,22 @@ const item = computed(() => {
 
 
 const isEdit = ref<boolean>(false);
-
 const copyItemObj = reactive<object>({...item.value});
+// const createdItem = reactive<Item>({
+//   id: 111,
+//   name: '',
+//   position: '',
+//   education: '',
+//   skills: '',
+//   experience: '',
+//   hoursPerWeek: +7123444888,
+//   employmentType: '',
+//   email: '',
+//   phone: '',
+//   resume: '',
+// }); // добавить нового кандидата
+
+
 
 const editMode = () => {
   isEdit.value = true;
@@ -39,6 +54,14 @@ const cancelEdit = () => {
   }
 }
 
+const deleteItem = (id: number) => {
+  if(props.storeType == 'candidate') {
+    candidateStore.deleteCandidate(id)
+  } else {
+    internshipStrore.deleteInterns(id)
+  }
+}
+
 const saveEdit = () => {
   isEdit.value = false;
   
@@ -48,6 +71,8 @@ const saveEdit = () => {
     internshipStrore.patchIntern(props.itemId, {...item.value})
   }
 }
+
+
 </script>
 
 <template>
@@ -211,7 +236,7 @@ const saveEdit = () => {
             Редактировать
           </button>
           <button
-            @click="candidateStore.deleteCandidate(item.id)"
+            @click="deleteItem(item.id)"
             class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm flex items-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

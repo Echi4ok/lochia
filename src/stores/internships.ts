@@ -3,17 +3,17 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import type { Intern } from '../types/types';
 // export interface Intern {
-//   id: number;
-//   name: string;
-//   position: string;
-//   education: string;
-//   skills: string;
-//   experience: string;
-//   hoursPerWeek: number;
-//   employmentType: string;
-//   email: string;
-//   phone: string;
-//   resume: string;
+  // id: number;
+  // name: string;
+  // position: string;
+  // education: string;
+  // skills: string;
+  // experience: string;
+  // hoursPerWeek: number;
+  // employmentType: string;
+  // email: string;
+  // phone: string;
+  // resume: string;
 // } 
 
 export const useInternStore = defineStore('interns', () => {
@@ -50,12 +50,23 @@ export const useInternStore = defineStore('interns', () => {
   }
 
   function getSearch (params: object) {
-    axios.get(`https://c81b66adafc63de9.mokky.dev/internship`, {
-      params
-    })
+    axios.get(`https://c81b66adafc63de9.mokky.dev/internship`)
     .then((res) => {
       console.log(res);
-      internsArr.value = res.data;
+      
+    }).catch((e) => {
+      console.log("Error")
+    })
+  }
+
+  function postIntern (createdItem: any) {
+    axios.post(`https://c81b66adafc63de9.mokky.dev/internship`, createdItem)
+    .then((res) => {
+      console.log(internsArr.value)
+      // internsArr.value = internsArr.value.push(res.data);
+      internsArr.value.push(res.data) // работает но надо сделать так чтобы еще открвалась форма автоматически
+      
+      
     }).catch((e) => {
       console.log("Error")
     })
@@ -63,5 +74,5 @@ export const useInternStore = defineStore('interns', () => {
 
 
     onMounted(getInterns);
-  return { getInterns, internsArr, deleteInterns, patchIntern, getSearch }
+  return { getInterns, internsArr, deleteInterns, patchIntern, getSearch, postIntern }
 })

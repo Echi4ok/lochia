@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useInternStore } from '@/stores/internships'
+import { useCandidatesStore } from '@/stores/candidates'
 import Fuse from 'fuse.js'
 import type { Candidate, Intern } from '@/types/types'
 
-// Интерфейс для типизации данных стажеров
 
+const internshipStore = useInternStore();
+const candidatesStore = useCandidatesStore();
 
 const props = defineProps<{
   storeType: "internship" | "candidate",
@@ -16,8 +18,8 @@ const emit = defineEmits<{
   (e: 'updatedItems', newItems: Intern[] | Candidate[]): void
 }>()
 
-const searchInput = ref('') // Реактивная переменная для поискового запроса
-const filteredResults = ref<Intern[] | Candidate []>([]) // Результаты поиска
+const searchInput = ref('') 
+const filteredResults = ref<Intern[] | Candidate []>([]) 
 
 // Инициализация Fuse.js
 const fuse = new Fuse<Intern | Candidate>([], {
@@ -27,11 +29,8 @@ const fuse = new Fuse<Intern | Candidate>([], {
     'education',
     'position',
     'experience',
-    'email',
-    'phone',
     'employmentType', 
-    'hoursPerWeek',   
-    'resume'          
+    'hoursPerWeek',            
   ],
   threshold: 0.4, // Допустимая погрешность
   ignoreLocation: true, // Поиск по всей строке
@@ -48,6 +47,11 @@ const updateValue = (newValue: string) => {
     
     console.log(`Найдено ${filteredResults.value.length} совпаденй`)
   } else {
+    if(props.storeType == 'candidate') {
+      filteredResults.value = [...candidatesStore.candidatesArr]
+    } else if (props.storeType == 'internship') {
+      filteredResults.value = [...internshipStore.internsArr]
+    }
     console.log('Казна пуста...')
   }
   emit('updatedItems', filteredResults.value) // передача обновленного массива к родителю
