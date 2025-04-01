@@ -19,7 +19,7 @@
           class="relative text-white hover:text-orange-400 transition-colors duration-300 group block md:inline-block py-2 md:py-0"
           active-class="text-orange-400"
         >
-          Home
+          Хоум
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-400 transition-all duration-300 group-hover:w-full"></span>
         </router-link>
         <router-link
@@ -27,7 +27,7 @@
           class="relative text-white hover:text-orange-400 transition-colors duration-300 group block md:inline-block py-2 md:py-0"
           active-class="text-orange-400"
         >
-          Intern
+          Стажеры
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-400 transition-all duration-300 group-hover:w-full"></span>
         </router-link>
         <router-link
@@ -35,7 +35,7 @@
           class="relative text-white hover:text-orange-400 transition-colors duration-300 group block md:inline-block py-2 md:py-0"
           active-class="text-orange-400"
         >
-          Candidate
+          Кандидаты
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-400 transition-all duration-300 group-hover:w-full"></span>
         </router-link>
       </nav>

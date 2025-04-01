@@ -32,8 +32,8 @@ export const useCandidatesStore = defineStore('candidates', () => {
   function deleteCandidate (id : number) {
     axios.delete(`https://44f1275207c2a7d3.mokky.dev/candidates/${id}`)
     .then((res) => {
+      candidatesArr.value = candidatesArr.value.filter((candidate) => candidate.id !== id)
       alert('Успешно удалено')
-      getCandidates();
     }).catch((e) => {
       console.log("Error")
     })
@@ -49,6 +49,19 @@ export const useCandidatesStore = defineStore('candidates', () => {
     })
   }
 
+  function postCandidate(createdItem: Object): Promise<any> { // Явно указываем возвращаемый тип Promise
+    return axios.post(`https://44f1275207c2a7d3.mokky.dev/candidates`, createdItem)
+      .then((res) => {
+        const newItem = res.data;
+        candidatesArr.value.push(newItem);
+        return newItem; // Возвращаем данные
+      })
+      .catch((e) => {
+        console.error('Ошибка при создании стажера', e);
+        throw e; // Пробрасываем ошибку дальше
+      });
+  }
+
   onMounted(getCandidates)
-  return { getCandidates, candidatesArr, deleteCandidate, patchCandidate }
+  return { getCandidates, candidatesArr, deleteCandidate, patchCandidate, postCandidate }
 })

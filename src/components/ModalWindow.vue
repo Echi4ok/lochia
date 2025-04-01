@@ -85,7 +85,7 @@ const saveEdit = () => {
       <!-- Заголовок модального окна -->
       <div class="sticky top-0 bg-white z-10 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-800">
-          {{ isEdit ? 'Редактирование кандидата' : 'Информация о кандидате' }}
+          {{ isEdit ? 'Редактирование анкеты' : 'Информация о соискателе' }}
         </h2>
         <button 
           @click="props.isShowingWindow()" 

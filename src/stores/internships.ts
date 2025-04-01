@@ -32,8 +32,8 @@ export const useInternStore = defineStore('interns', () => {
   function deleteInterns (id : number) {
     axios.delete(`https://c81b66adafc63de9.mokky.dev/internship/${id}`)
     .then((res) => {
-      console.log(res)
-      getInterns();
+      internsArr.value = internsArr.value.filter((intern) => intern.id !== id)
+      alert('Успешно удалено')
     }).catch((e) => {
       console.log("Error")
     })
@@ -49,30 +49,30 @@ export const useInternStore = defineStore('interns', () => {
     })
   }
 
-  function getSearch (params: object) {
-    axios.get(`https://c81b66adafc63de9.mokky.dev/internship`)
-    .then((res) => {
-      console.log(res);
+  // function getSearch () {
+  //   axios.get(`https://c81b66adafc63de9.mokky.dev/internship`)
+  //   .then((res) => {
+  //     console.log(res);
       
-    }).catch((e) => {
-      console.log("Error")
-    })
-  }
+  //   }).catch((e) => {
+  //     console.log("Error")
+  //   })
+  // }
 
-  function postIntern (createdItem: any) {
-    axios.post(`https://c81b66adafc63de9.mokky.dev/internship`, createdItem)
-    .then((res) => {
-      console.log(internsArr.value)
-      // internsArr.value = internsArr.value.push(res.data);
-      internsArr.value.push(res.data) // работает но надо сделать так чтобы еще открвалась форма автоматически
-      
-      
-    }).catch((e) => {
-      console.log("Error")
-    })
+  function postIntern(createdItem: Object): Promise<any> { // Явно указываем возвращаемый тип Promise
+    return axios.post(`https://c81b66adafc63de9.mokky.dev/internship`, createdItem)
+      .then((res) => {
+        const newItem = res.data;
+        internsArr.value.push(newItem);
+        return newItem; // Возвращаем данные
+      })
+      .catch((e) => {
+        console.error('Ошибка при создании стажера', e);
+        throw e; // Пробрасываем ошибку дальше
+      });
   }
 
 
     onMounted(getInterns);
-  return { getInterns, internsArr, deleteInterns, patchIntern, getSearch, postIntern }
+  return { getInterns, internsArr, deleteInterns, patchIntern, postIntern }
 })

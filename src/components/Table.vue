@@ -17,18 +17,20 @@ const props = defineProps<{
 
 let isOpenMenu = ref<boolean>(false);
 let itemId = ref<number>();
+const store = ref<string>();
+const searchInput = ref<string>();
 const displayedItems = ref<Intern[] | Candidate[]>([]);
   const createdItem = reactive({
-  name: '',
-  position: '',
-  education: '',
-  skills: '',
-  experience: '',
-  hoursPerWeek: +7123444888,
-  employmentType: '',
-  email: '',
-  phone: '',
-  resume: '',
+  name: '-',
+  position: '-',
+  education: '-',
+  skills: '-',
+  experience: '-',
+  hoursPerWeek: 0,
+  employmentType: '-',
+  email: '-',
+  phone: '+7(999)1114343',
+  resume: '-',
 }); // добавить нового кандидата
 
 displayedItems.value = props.items
@@ -40,27 +42,53 @@ watch(() => props.items, () => {
 
 const showId = (id: number) => {
     itemId.value = id;
-    isShowingWindow();
+    isOpenMenu.value = true;
 }
 
 const isShowingWindow = () => {
     isOpenMenu.value = !isOpenMenu.value;
 }
 
-const handleUpdatedItems = (newItems: any) => {
-  displayedItems.value = [...newItems]
+const handleUpdatedItems = (newItems: Intern[] | Candidate[]) => {
+  displayedItems.value = newItems
+}
+
+const searchInputValue = (search: string) => {
+  searchInput.value =  search; 
 }
 
 const createNewItem = () => {
+  if(!searchInput.value) { // делаем кнопку "добавить" не рабочей если инпут не пустой
   if(props.storeType == 'candidate') {
-    
+    const newItem = candidateStore.postCandidate(createdItem);
+    newItem.then((res) => {
+      showId(res.id)
+    }).catch((e) => {
+      console.error('Ошибка в получении айди обьекта при его создании')
+      throw new Error(e);
+    })
   } else if (props.storeType == 'internship') {
-    internshipStore.postIntern(createdItem);
-
+    const newItem = internshipStore.postIntern(createdItem);
+    newItem.then((res) => {
+      showId(res.id)
+    }).catch((e) => {
+      console.error('Ошибка в получении айди обьекта при его создании')
+      throw new Error(e);
+    })
   }
-
+} else {
+ // по хорошему очищать инпут самому а не просить пользователя
+ // и оповещать в форме что вы создали пользователя
+  alert(`Очисти инпут`)
+  
+}
 }
 
+if(props.storeType == 'candidate') {
+    store.value = 'кандидата'
+  } else if (props.storeType == 'internship') {
+    store.value = 'стажера'
+  }
 
 
 </script>
@@ -76,10 +104,10 @@ const createNewItem = () => {
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
-        Добавить кандидата
+        Добавить {{ store }}
       </button>
       
-      <Search :storeType="storeType" :items="props.items" @updatedItems="handleUpdatedItems"/>
+      <Search :storeType="storeType" :items="props.items" @updatedItems="handleUpdatedItems" @search="searchInputValue"/>
     </div>
 
     <!-- Таблица -->

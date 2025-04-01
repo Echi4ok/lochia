@@ -4,7 +4,7 @@
 
 <template>
   <div>
-    <p>Home</p>
+    <p>Че зырите глаза пузырите</p>
   </div>
 </template>
 

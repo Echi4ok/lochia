@@ -16,6 +16,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'updatedItems', newItems: Intern[] | Candidate[]): void
+  (e: 'search', search: string) : void
 }>()
 
 const searchInput = ref('') 
@@ -38,7 +39,7 @@ const fuse = new Fuse<Intern | Candidate>([], {
 })
 
 watch(() => props.items, (newItems) => {
-  fuse.setCollection(newItems)
+  fuse.setCollection(newItems);
 }, { immediate: true })
 
 const updateValue = (newValue: string) => {
@@ -48,13 +49,14 @@ const updateValue = (newValue: string) => {
     console.log(`Найдено ${filteredResults.value.length} совпаденй`)
   } else {
     if(props.storeType == 'candidate') {
-      filteredResults.value = [...candidatesStore.candidatesArr]
+      filteredResults.value = candidatesStore.candidatesArr
     } else if (props.storeType == 'internship') {
-      filteredResults.value = [...internshipStore.internsArr]
+      filteredResults.value = internshipStore.internsArr
     }
     console.log('Казна пуста...')
   }
   emit('updatedItems', filteredResults.value) // передача обновленного массива к родителю
+  emit('search', searchInput.value)
 }
 
 watch(searchInput, (newValue) => {
@@ -67,7 +69,7 @@ watch(searchInput, (newValue) => {
     <input
       v-model="searchInput"
       type="text"
-      placeholder="Поиск по кандидатам..."
+      placeholder="Поиск по таблице..."
       class="search-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
     />
   </div>
