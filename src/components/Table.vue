@@ -1,37 +1,53 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue';
 import ModalWindow from './ModalWindow.vue';
-import Search from './Search.vue';
-import type { Intern, Candidate } from '../types/types';
-import { useCandidatesStore } from '@/stores/candidates';
-import { useInternStore } from '@/stores/internships';
-import {type Item } from '../types/types';
+import Filters from './Filters.vue';
+import type { Intern } from '../types/types';
 
-const candidateStore = useCandidatesStore();
+import { useInternStore } from '@/stores/internships';
+
+
+
+
 const internshipStore = useInternStore();
 
 const props = defineProps<{
-  items: Intern[] | Candidate[],
+  items: Intern[],
   storeType: "internship" | "candidate", 
 }>();
 
 let isOpenMenu = ref<boolean>(false);
-let itemId = ref<number>();
-const store = ref<string>();
+let itemId = ref<string>();
+const store = ref<string>("стажера");
 const searchInput = ref<string>();
-const displayedItems = ref<Intern[] | Candidate[]>([]);
-  const createdItem = reactive({
-  name: '-',
-  position: '-',
-  education: '-',
-  skills: '-',
-  experience: '-',
-  hoursPerWeek: 0,
-  employmentType: '-',
-  email: '-',
-  phone: '+7(999)1114343',
-  resume: '-',
-}); // добавить нового кандидата
+const displayedItems = ref<Intern[]>([]);
+  const createdItem = {
+  body: {
+    education: "new name",
+    email: "newname@example.com",
+    employmentType: "-",
+    experience: "-",
+    hoursPerWeek: 3,  // Исправлено hoursPerMeek → hoursPerWeek
+    links: "-",
+    name: "Alice Smith",
+    phone: "-",
+    position: "-",
+    resume: "-",
+    skills: "-"
+  }
+}
+//   const createdItem = reactive({
+//   name: '-',
+//   position: '-',
+//   education: '-',
+//   skills: '-',
+//   experience: '-',
+//   hoursPerWeek: 0,
+//   employmentType: '-',
+//   email: '-',
+//   phone: '+7(999)1114343',
+//   resume: '-',
+// }); // добавить нового кандидата
 
 displayedItems.value = props.items
 
@@ -40,7 +56,7 @@ watch(() => props.items, () => {
   displayedItems.value = props.items
 })
 
-const showId = (id: number) => {
+const showId = (id: string) => {
     itemId.value = id;
     isOpenMenu.value = true;
 }
@@ -49,66 +65,36 @@ const isShowingWindow = () => {
     isOpenMenu.value = !isOpenMenu.value;
 }
 
-const handleUpdatedItems = (newItems: Intern[] | Candidate[]) => {
-  displayedItems.value = newItems
-}
-
-const searchInputValue = (search: string) => {
-  searchInput.value =  search; 
-}
 
 const createNewItem = () => {
-  if(!searchInput.value) { // делаем кнопку "добавить" не рабочей если инпут не пустой
-  if(props.storeType == 'candidate') {
-    const newItem = candidateStore.postCandidate(createdItem);
-    newItem.then((res) => {
-      showId(res.id)
-    }).catch((e) => {
-      console.error('Ошибка в получении айди обьекта при его создании')
-      throw new Error(e);
-    })
-  } else if (props.storeType == 'internship') {
-    const newItem = internshipStore.postIntern(createdItem);
-    newItem.then((res) => {
-      showId(res.id)
-    }).catch((e) => {
-      console.error('Ошибка в получении айди обьекта при его создании')
-      throw new Error(e);
-    })
-  }
-} else {
- // по хорошему очищать инпут самому а не просить пользователя
- // и оповещать в форме что вы создали пользователя
-  alert(`Очисти инпут`)
+    internshipStore.postIntern(createdItem);
   
 }
-}
 
-if(props.storeType == 'candidate') {
-    store.value = 'кандидата'
-  } else if (props.storeType == 'internship') {
-    store.value = 'стажера'
-  }
+
 
 
 </script>
 
 <template>
   <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
-    <!-- Поисковая строка -->
-    <div class="flex items-center justify-between mb-4">
+    <!-- Заголовочная строка с фильтрами и кнопкой -->
+    <div class="flex items-center justify-between mb-4 gap-4">
+      <!-- Компонент фильтров (слева) -->
+      <Filters class="flex-grow"/>
+      
+      <!-- Кнопка добавления (справа) -->
       <button
         @click="createNewItem()"
-        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm flex items-center"
+        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm flex items-center whitespace-nowrap"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
         Добавить {{ store }}
       </button>
-      
-      <Search :storeType="storeType" :items="props.items" @updatedItems="handleUpdatedItems" @search="searchInputValue"/>
     </div>
+
 
     <!-- Таблица -->
     <div class="table-container border border-gray-200 rounded-lg overflow-hidden shadow-sm">
@@ -143,18 +129,18 @@ if(props.storeType == 'candidate') {
             @click="showId(item.id)"
             class="hover:bg-gray-50 cursor-pointer transition-colors"
           >
-            <td class="px-4 py-3 text-sm font-medium text-gray-900 truncate">{{ item.name }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.position }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.education }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.skills }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 text-center">{{ item.experience }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 text-center">{{ item.hoursPerWeek }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 capitalize">{{ item.employmentType }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.email }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600">{{ item.phone }}</td>
+            <td class="px-4 py-3 text-sm font-medium text-gray-900 truncate">{{ item.body.name }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.body.position }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.body.education }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.body.skills }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 text-center">{{ item.body.experience }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 text-center">{{ item.body.hoursPerWeek }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 capitalize">{{ item.body.employmentType }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.body.email }}</td>
+            <td class="px-4 py-3 text-sm text-gray-600">{{ item.body.phone }}</td>
             <td class="px-4 py-3 text-sm text-center">
               <a 
-                :href="item.resume" 
+                :href="item.body.resume" 
                 target="_blank"
                 class="text-purple-600 hover:text-purple-800"
                 @click.stop

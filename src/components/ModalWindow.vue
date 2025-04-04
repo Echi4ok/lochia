@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import {computed, ref, reactive} from 'vue'
-import { useCandidatesStore } from '@/stores/candidates';
+
 import { useInternStore } from '@/stores/internships';
-import type { Item } from '../types/types';
+import type { Intern } from '../types/types';
 import { storeToRefs } from 'pinia';
 
 
-const candidateStore = useCandidatesStore();
+
 const internshipStrore = useInternStore();
 const props = defineProps<{
-  itemId: number, // айди чела на которого кликнули
+  itemId: string, // айди чела на которого кликнули
   isShowingWindow: Function,
-  items: Item[], // массив канидадтов либо стажеров
-  storeType: "internship" | "candidate", 
+  items: Intern[], // массив канидадтов либо стажеров
 }>();
 
 const item = computed(() => {
@@ -54,22 +53,13 @@ const cancelEdit = () => {
   }
 }
 
-const deleteItem = (id: number) => {
-  if(props.storeType == 'candidate') {
-    candidateStore.deleteCandidate(id)
-  } else {
+const deleteItem = (id: string) => {
     internshipStrore.deleteInterns(id)
-  }
 }
 
 const saveEdit = () => {
+  internshipStrore.patchIntern(props.itemId, {...item.value})
   isEdit.value = false;
-  
-  if(props.storeType == "candidate") {
-    candidateStore.patchCandidate(props.itemId, {...item.value})
-  } else {
-    internshipStrore.patchIntern(props.itemId, {...item.value})
-  }
 }
 
 
@@ -104,39 +94,39 @@ const saveEdit = () => {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Имя</p>
-              <p class="text-gray-900">{{ item.name }}</p>
+              <p class="text-gray-900">{{ item.body.name }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Должность</p>
-              <p class="text-gray-900">{{ item.position }}</p>
+              <p class="text-gray-900">{{ item.body.position }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Образование</p>
-              <p class="text-gray-900">{{ item.education }}</p>
+              <p class="text-gray-900">{{ item.body.education }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Навыки</p>
-              <p class="text-gray-900">{{ item.skills }}</p>
+              <p class="text-gray-900">{{ item.body.skills }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Опыт</p>
-              <p class="text-gray-900">{{ item.experience }}</p>
+              <p class="text-gray-900">{{ item.body.experience }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Часов в неделю</p>
-              <p class="text-gray-900">{{ item.hoursPerWeek }}</p>
+              <p class="text-gray-900">{{ item.body.hoursPerWeek }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Тип занятости</p>
-              <p class="text-gray-900 capitalize">{{ item.employmentType }}</p>
+              <p class="text-gray-900 capitalize">{{ item.body.employmentType }}</p>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Email</p>
-              <a :href="`mailto:${item.email}`" class="text-blue-600 hover:underline">{{ item.email }}</a>
+              <a :href="`mailto:${item.body.email}`" class="text-blue-600 hover:underline">{{ item.body.email }}</a>
             </div>
             <div class="space-y-1">
               <p class="text-sm font-medium text-gray-500">Телефон</p>
-              <a :href="`tel:${item.phone}`" class="text-blue-600 hover:underline">{{ item.phone }}</a>
+              <a :href="`tel:${item.body.phone}`" class="text-blue-600 hover:underline">{{ item.body.phone }}</a>
             </div>
           </div>
         </template>
@@ -148,7 +138,7 @@ const saveEdit = () => {
               <label class="block text-sm font-medium text-gray-700">Имя</label>
               <input
                 type="text"
-                v-model="item.name"
+                v-model="item.body.name"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -156,7 +146,7 @@ const saveEdit = () => {
               <label class="block text-sm font-medium text-gray-700">Должность</label>
               <input
                 type="text"
-                v-model="item.position"
+                v-model="item.body.position"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -164,7 +154,7 @@ const saveEdit = () => {
               <label class="block text-sm font-medium text-gray-700">Образование</label>
               <input
                 type="text"
-                v-model="item.education"
+                v-model="item.body.education"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -172,7 +162,7 @@ const saveEdit = () => {
               <label class="block text-sm font-medium text-gray-700">Навыки</label>
               <input
                 type="text"
-                v-model="item.skills"
+                v-model="item.body.skills"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -180,7 +170,7 @@ const saveEdit = () => {
               <label class="block text-sm font-medium text-gray-700">Опыт</label>
               <input
                 type="text"
-                v-model="item.experience"
+                v-model="item.body.experience"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -188,14 +178,14 @@ const saveEdit = () => {
               <label class="block text-sm font-medium text-gray-700">Часов в неделю</label>
               <input
                 type="number"
-                v-model="item.hoursPerWeek"
+                v-model="item.body.hoursPerWeek"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
             <div class="space-y-1">
               <label class="block text-sm font-medium text-gray-700">Тип занятости</label>
               <select
-                v-model="item.employmentType"
+                v-model="item.body.employmentType"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
                 <option value="очно">Очно</option>
@@ -207,7 +197,7 @@ const saveEdit = () => {
               <label class="block text-sm font-medium text-gray-700">Email</label>
               <input
                 type="email"
-                v-model="item.email"
+                v-model="item.body.email"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>
@@ -215,7 +205,7 @@ const saveEdit = () => {
               <label class="block text-sm font-medium text-gray-700">Телефон</label>
               <input
                 type="tel"
-                v-model="item.phone"
+                v-model="item.body.phone"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
             </div>

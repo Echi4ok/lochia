@@ -1,39 +1,34 @@
-export interface Candidate {
-  id: number;
-  name: string;
-  position: string;
+export interface InternBody {
   education: string;
-  skills: string;
+  email: string;
+  employmentType: string;
   experience: string;
   hoursPerWeek: number;
-  employmentType: string;
-  email: string;
+  links: string;
+  name: string;
   phone: string;
+  position: string;
   resume: string;
-} 
+  skills: string;
+}
+
 export interface Intern {
-  id: number;
-  name: string;
-  position: string;
-  education: string;
-  skills: string;
-  experience: string;
-  hoursPerWeek: number;
-  employmentType: string;
-  email: string;
-  phone: string;
-  resume: string;
-} 
-export interface Item {
-    id: number;
-    name: string;
-    position: string;
-    education: string;
-    skills: string;
-    experience: string;
-    hoursPerWeek: number;
-    employmentType: string;
-    email: string;
-    phone: string;
-    resume: string;
-  }
+  body: InternBody;
+  id: string; 
+}
+
+
+// export interface FlatCandidate {
+//   id: string;
+//   education: string;
+//   email: string;
+//   employmentType: string | null;
+//   experience: string;
+//   hoursPerWeek: number;
+//   links: string;
+//   name: string;
+//   phone: string;
+//   position: string;
+//   resume: string | null;
+//   skills: string;
+// }

@@ -30,14 +30,14 @@
           Стажеры
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-400 transition-all duration-300 group-hover:w-full"></span>
         </router-link>
-        <router-link
+        <!-- <router-link
           to="/candidate"
           class="relative text-white hover:text-orange-400 transition-colors duration-300 group block md:inline-block py-2 md:py-0"
           active-class="text-orange-400"
         >
           Кандидаты
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-400 transition-all duration-300 group-hover:w-full"></span>
-        </router-link>
+        </router-link> -->
       </nav>
     </div>
   </header>

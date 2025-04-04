@@ -21,16 +21,17 @@ export const useInternStore = defineStore('interns', () => {
 
 
   function getInterns () {
-    axios.get('https://c81b66adafc63de9.mokky.dev/internship')
+    axios.get('http://do.gberdyshev.tech:8080/api/v1/candidates')
     .then((res) => {
-        internsArr.value = res.data;
+        internsArr.value = res.data.data;
+        console.log(res.data.data)
     }).catch((e) => {
       console.log(e.message)
     })
   }
 
-  function deleteInterns (id : number) {
-    axios.delete(`https://c81b66adafc63de9.mokky.dev/internship/${id}`)
+  function deleteInterns (id : string) {
+    axios.delete(`http://do.gberdyshev.tech:8080/api/v1/candidates${id}`)
     .then((res) => {
       internsArr.value = internsArr.value.filter((intern) => intern.id !== id)
       alert('Успешно удалено')
@@ -39,37 +40,27 @@ export const useInternStore = defineStore('interns', () => {
     })
   }
 
-  function patchIntern (id: number, updatedItem: Object) {
-    axios.patch(`https://c81b66adafc63de9.mokky.dev/internship/${id}`, updatedItem)
+  function patchIntern (id: string, updatedItem: Object) {
+    console.log(id, updatedItem)
+    axios.put(`http://do.gberdyshev.tech:8080/api/v1/candidates/${id}`, updatedItem)
     .then((res) => {
-      console.log(res);
+      console.log(res.data)
       alert('Данные успешно обновлены');
     }).catch((e) => {
       console.log("Error")
     })
   }
 
-  // function getSearch () {
-  //   axios.get(`https://c81b66adafc63de9.mokky.dev/internship`)
-  //   .then((res) => {
-  //     console.log(res);
+  function postIntern (updatedItem: Object) {
+    console.log(updatedItem)
+    axios.post(`http://do.gberdyshev.tech:8080/api/v1/candidates`, updatedItem)
+    .then((res) => {
       
-  //   }).catch((e) => {
-  //     console.log("Error")
-  //   })
-  // }
-
-  function postIntern(createdItem: Object): Promise<any> { // Явно указываем возвращаемый тип Promise
-    return axios.post(`https://c81b66adafc63de9.mokky.dev/internship`, createdItem)
-      .then((res) => {
-        const newItem = res.data;
-        internsArr.value.push(newItem);
-        return newItem; // Возвращаем данные
-      })
-      .catch((e) => {
-        console.error('Ошибка при создании стажера', e);
-        throw e; // Пробрасываем ошибку дальше
-      });
+      console.log(res.data);
+      alert('Успешно создан кандидат');
+    }).catch((e) => {
+      console.log("Error")
+    })
   }
 
 
