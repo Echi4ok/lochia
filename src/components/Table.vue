@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
-import ModalWindow from './ModalWindow.vue';
-import Filters from './Filters.vue';
-import type { Intern } from '../types/types';
+import { reactive, ref, watch } from 'vue'
+import ModalWindow from './ModalWindow.vue'
+import Filters from '@/components/Filters.vue'
+import CreateBtn from '@/components/CreateBtn.vue'
+import type { Intern } from '../types/types'
 
 import { useInternStore } from '@/stores/internships';
 
@@ -19,35 +20,21 @@ const props = defineProps<{
 let isOpenMenu = ref<boolean>(false);
 let itemId = ref<string>();
 const store = ref<string>("стажера");
-const searchInput = ref<string>();
 const displayedItems = ref<Intern[]>([]);
-  const createdItem = {
-  body: {
-    education: "new name",
-    email: "newname@example.com",
-    employmentType: "-",
-    experience: "-",
-    hoursPerWeek: 3,  // Исправлено hoursPerMeek → hoursPerWeek
-    links: "-",
-    name: "Alice Smith",
-    phone: "-",
-    position: "-",
-    resume: "-",
-    skills: "-"
-  }
-}
 //   const createdItem = reactive({
-//   name: '-',
-//   position: '-',
-//   education: '-',
-//   skills: '-',
-//   experience: '-',
-//   hoursPerWeek: 0,
-//   employmentType: '-',
-//   email: '-',
-//   phone: '+7(999)1114343',
-//   resume: '-',
-// }); // добавить нового кандидата
+//     education: "new",
+//     email: "newname2@example.com",
+//     employmentType: "remo123te",
+//     experience: "2",
+//     hoursPerWeek: 25, 
+//     links: "meow",
+//     name: "Alic123e Smith",
+//     phone: "666",
+//     position: "IT",
+//     resume: "/d/d/d",
+//     skills: "JavaScript",
+// })
+
 
 displayedItems.value = props.items
 
@@ -58,17 +45,16 @@ watch(() => props.items, () => {
 
 const showId = (id: string) => {
     itemId.value = id;
-    isOpenMenu.value = true;
+    isShowingWindow();
 }
 
 const isShowingWindow = () => {
     isOpenMenu.value = !isOpenMenu.value;
 }
 
-
-const createNewItem = () => {
-    internshipStore.postIntern(createdItem);
-  
+const creatingItem = () => {
+  itemId.value = undefined;
+  isShowingWindow();
 }
 
 
@@ -80,28 +66,26 @@ const createNewItem = () => {
   <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
     <!-- Заголовочная строка с фильтрами и кнопкой -->
     <div class="flex items-center justify-between mb-4 gap-4">
-      <!-- Компонент фильтров (слева) -->
       <Filters class="flex-grow"/>
-      
-      <!-- Кнопка добавления (справа) -->
       <button
-        @click="createNewItem()"
+        @click="creatingItem()"
         class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm flex items-center whitespace-nowrap"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
-        Добавить {{ store }}
+        Добавить стажера
       </button>
     </div>
 
 
     <!-- Таблица -->
     <div class="table-container border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-      <ModalWindow v-if="isOpenMenu && itemId !== undefined"
+      <ModalWindow v-if="isOpenMenu"
       :itemId="itemId" 
       :items="props.items" 
       :isShowingWindow="isShowingWindow" 
+      :isOpenMenu="isOpenMenu"
       :storeType="props.storeType"
       />
       <table class="w-full">

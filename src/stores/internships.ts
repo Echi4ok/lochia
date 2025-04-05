@@ -2,19 +2,19 @@ import { ref, computed, onMounted } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import type { Intern } from '../types/types';
-// export interface Intern {
-  // id: number;
-  // name: string;
-  // position: string;
-  // education: string;
-  // skills: string;
-  // experience: string;
-  // hoursPerWeek: number;
-  // employmentType: string;
-  // email: string;
-  // phone: string;
-  // resume: string;
-// } 
+export interface InternBody {
+  education: string;
+  email: string;
+  employmentType: string;
+  experience: string;
+  hoursPerWeek: number;
+  links: string;
+  name: string;
+  phone: string;
+  position: string;
+  resume: string;
+  skills: string;
+}
 
 export const useInternStore = defineStore('interns', () => {
   let internsArr = ref<Intern[]>([]);
@@ -31,7 +31,7 @@ export const useInternStore = defineStore('interns', () => {
   }
 
   function deleteInterns (id : string) {
-    axios.delete(`http://do.gberdyshev.tech:8080/api/v1/candidates${id}`)
+    axios.delete(`http://do.gberdyshev.tech:8080/api/v1/candidates/${id}`)
     .then((res) => {
       internsArr.value = internsArr.value.filter((intern) => intern.id !== id)
       alert('Успешно удалено')
@@ -39,8 +39,9 @@ export const useInternStore = defineStore('interns', () => {
       console.log("Error")
     })
   }
+  
 
-  function patchIntern (id: string, updatedItem: Object) {
+  function patchIntern (id: string, updatedItem: InternBody) {
     console.log(id, updatedItem)
     axios.put(`http://do.gberdyshev.tech:8080/api/v1/candidates/${id}`, updatedItem)
     .then((res) => {
@@ -51,12 +52,12 @@ export const useInternStore = defineStore('interns', () => {
     })
   }
 
-  function postIntern (updatedItem: Object) {
-    console.log(updatedItem)
-    axios.post(`http://do.gberdyshev.tech:8080/api/v1/candidates`, updatedItem)
+  function postIntern (createdItem: InternBody) {
+    console.log(createdItem)
+    axios.post(`http://do.gberdyshev.tech:8080/api/v1/candidates`, createdItem)
     .then((res) => {
-      
-      console.log(res.data);
+      // internsArr.value.push(res.data)
+      console.log(internsArr.value)
       alert('Успешно создан кандидат');
     }).catch((e) => {
       console.log("Error")

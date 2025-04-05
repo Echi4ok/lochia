@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref, reactive} from 'vue'
+import {computed, ref, reactive, watch} from 'vue'
 
 import { useInternStore } from '@/stores/internships';
 import type { Intern } from '../types/types';
@@ -9,13 +9,30 @@ import { storeToRefs } from 'pinia';
 
 const internshipStrore = useInternStore();
 const props = defineProps<{
-  itemId: string, // айди чела на которого кликнули
+  itemId: string | undefined, // айди чела на которого кликнули
   isShowingWindow: Function,
   items: Intern[], // массив канидадтов либо стажеров
 }>();
 
 const item = computed(() => {
-    if(props.itemId === undefined) return alert("ID не найден")
+    if(props.itemId === undefined) {
+      isEdit.value = true;
+      return reactive({
+        body: {
+          education: "new",
+          email: "newnamwerte2@example.com",
+          employmentType: "removre123te",
+          experience: "2",
+          hoursPerWeek: 30, 
+          links: "meodfvw",
+          name: "Alic1vfd23e Smith",
+          phone: "6dfv66",
+          position: "IT",
+          resume: "/d/d/d",
+          skills: "JavaScript",
+        }
+    })
+    }
     else return props.items.find((t) => { 
         return t.id === props.itemId
     })
@@ -24,42 +41,40 @@ const item = computed(() => {
 
 const isEdit = ref<boolean>(false);
 const copyItemObj = reactive<object>({...item.value});
-// const createdItem = reactive<Item>({
-//   id: 111,
-//   name: '',
-//   position: '',
-//   education: '',
-//   skills: '',
-//   experience: '',
-//   hoursPerWeek: +7123444888,
-//   employmentType: '',
-//   email: '',
-//   phone: '',
-//   resume: '',
-// }); // добавить нового кандидата
+
 
 
 
 const editMode = () => {
-  isEdit.value = true;
+  isEdit.value = !isEdit.value;
 
-  console.log(copyItemObj)
 }
 
 const cancelEdit = () => {
-  isEdit.value = false;
+  if(props.itemId == undefined) {
+    props.isShowingWindow();
+  } else {
+    editMode();
   if (item.value) { 
     Object.assign(item.value, copyItemObj);
+  }
   }
 }
 
 const deleteItem = (id: string) => {
     internshipStrore.deleteInterns(id)
+    props.isShowingWindow(); 
 }
 
 const saveEdit = () => {
-  internshipStrore.patchIntern(props.itemId, {...item.value})
-  isEdit.value = false;
+  if(props.itemId == undefined) { // то кнопка создать
+    internshipStrore.postIntern({...item.value.body})
+    props.isShowingWindow();
+  } else { // то кнопка сохранить тоесть обновить изменения
+    internshipStrore.patchIntern(props.itemId, {...item.value.body})
+    props.isShowingWindow(); 
+    isEdit.value = false;
+  }
 }
 
 
@@ -75,7 +90,7 @@ const saveEdit = () => {
       <!-- Заголовок модального окна -->
       <div class="sticky top-0 bg-white z-10 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-800">
-          {{ isEdit ? 'Редактирование анкеты' : 'Информация о соискателе' }}
+          {{ !props.itemId ? 'Создание нового соискателя' : (isEdit ? 'Редактирование анкеты' : 'Информация о соискателе') }}
         </h2>
         <button 
           @click="props.isShowingWindow()" 
@@ -249,7 +264,7 @@ const saveEdit = () => {
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
-            Сохранить
+            {{ props.itemId ? 'Сохранить' : 'Создать' }}
           </button>
         </template>
       </div>
