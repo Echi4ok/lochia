@@ -19,19 +19,19 @@ const item = computed(() => {
       isEdit.value = true;
       return reactive({
         body: {
-          education: "new",
-          email: "newnamwerte2@example.com",
-          employmentType: "removre123te",
-          experience: "2",
-          hoursPerWeek: 30, 
-          links: "meodfvw",
-          name: "Alic1vfd23e Smith",
-          phone: "6dfv66",
-          position: "IT",
-          resume: "/d/d/d",
-          skills: "JavaScript",
+          name: "Иванов Иван Иванович",        // обязательное строковое поле
+          email: "example@example.com",        // обязательное, формат email
+          phone: "+77777777777",              // обязательное, формат phone
+          position: "Junior Backend Developer", // строка
+          education: "Высшее",                // строка
+          skills: "JavaScript, Python",       // строка
+          experience: "1 год",                // строка
+          hoursPerWeek: 20,                   // число, min:20, max:40
+          employmentType: "in-office",        // enum: ["in-office", "remote", "hybrid"]
+          links: "https://github.com/user",   // строка (опционально)
+          resume: "/path/to/resume.pdf"       // строка (опционально)
         }
-    })
+      })
     }
     else return props.items.find((t) => { 
         return t.id === props.itemId
@@ -42,22 +42,21 @@ const item = computed(() => {
 const isEdit = ref<boolean>(false);
 const copyItemObj = reactive<object>({...item.value});
 
-
+watch(() => item, (updItem) => {
+Object.assign(copyItemObj, updItem)
+}, {immediate: true})
 
 
 const editMode = () => {
   isEdit.value = !isEdit.value;
-
 }
 
 const cancelEdit = () => {
   if(props.itemId == undefined) {
     props.isShowingWindow();
   } else {
-    editMode();
-  if (item.value) { 
     Object.assign(item.value, copyItemObj);
-  }
+    editMode();
   }
 }
 
@@ -90,7 +89,7 @@ const saveEdit = () => {
       <!-- Заголовок модального окна -->
       <div class="sticky top-0 bg-white z-10 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-800">
-          {{ !props.itemId ? 'Создание нового соискателя' : (isEdit ? 'Редактирование анкеты' : 'Информация о соискателе') }}
+          {{ !props.itemId ? 'Создание нового кандидата' : (isEdit ? 'Редактирование анкеты' : 'Информация о соискателе') }}
         </h2>
         <button 
           @click="props.isShowingWindow()" 
