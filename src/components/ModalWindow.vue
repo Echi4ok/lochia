@@ -14,12 +14,12 @@ const props = defineProps<{
   items: Intern[], // массив канидадтов либо стажеров
 }>();
 
-const item = computed(() => {
+let item = computed(() => {
     if(props.itemId === undefined) {
       isEdit.value = true;
       return reactive({
         body: {
-          name: "Иванов Иван Иванович",        // обязательное строковое поле
+          name: "Иваномвав Иван Иванович",        // обязательное строковое поле
           email: "example@example.com",        // обязательное, формат email
           phone: "+77777777777",              // обязательное, формат phone
           position: "Junior Backend Developer", // строка
@@ -27,9 +27,9 @@ const item = computed(() => {
           skills: "JavaScript, Python",       // строка
           experience: "1 год",                // строка
           hoursPerWeek: 20,                   // число, min:20, max:40
-          employmentType: "in-office",        // enum: ["in-office", "remote", "hybrid"]
-          links: "https://github.com/user",   // строка (опционально)
-          resume: "/path/to/resume.pdf"       // строка (опционально)
+          employmentType: "удалённо",        // enum: ["in-office", "remote", "hybrid"]
+          links: "https://gвавпыамdfsithub.com/user",   // строка (опционально)
+          pathToResume: "wedfqwec"       // строка (опционально)
         }
       })
     }
@@ -40,11 +40,10 @@ const item = computed(() => {
 
 
 const isEdit = ref<boolean>(false);
-const copyItemObj = reactive<object>({...item.value});
+let copyItemObj = reactive<object>({});
 
-watch(() => item, (updItem) => {
-Object.assign(copyItemObj, updItem)
-}, {immediate: true})
+// кнопка отмена в режиме радлктирования не работает как надо
+// ебучий item.value.body подсвечивает кркасным цветом, но зато работает 
 
 
 const editMode = () => {
@@ -55,6 +54,7 @@ const cancelEdit = () => {
   if(props.itemId == undefined) {
     props.isShowingWindow();
   } else {
+    console.log(item.value)
     Object.assign(item.value, copyItemObj);
     editMode();
   }
@@ -142,6 +142,41 @@ const saveEdit = () => {
               <p class="text-sm font-medium text-gray-500">Телефон</p>
               <a :href="`tel:${item.body.phone}`" class="text-blue-600 hover:underline">{{ item.body.phone }}</a>
             </div>
+            <!-- Ссылки -->
+            <div class="md:col-span-2 space-y-1">
+              <p class="text-sm font-medium text-gray-500">Ссылки</p>
+              <div class="flex flex-wrap gap-2">
+                <template v-if="item.body.links && item.body.links.length">
+                  <a 
+                    v-for="(link, index) in item.body.links" 
+                    :key="index" 
+                    :href="link" 
+                    target="_blank" 
+                    class="text-blue-600 hover:underline break-all"
+                  >
+                    {{ link }}
+                  </a>
+                </template>
+                <p v-else class="text-gray-900">Нет ссылок</p>
+              </div>
+            </div>
+            <!-- Резюме -->
+            <div class="md:col-span-2 space-y-1">
+              <p class="text-sm font-medium text-gray-500">Резюме</p>
+              <div v-if="item.body.pathToResume">
+                <a 
+                  :href="item.body.pathToResume" 
+                  target="_blank" 
+                  class="text-blue-600 hover:underline flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  Просмотреть резюме
+                </a>
+              </div>
+              <p v-else class="text-gray-900">Резюме не загружено</p>
+            </div>
           </div>
         </template>
 
@@ -203,7 +238,7 @@ const saveEdit = () => {
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
                 <option value="очно">Очно</option>
-                <option value="удаленно">Удаленно</option>
+                <option value="удалённо">Удалённо</option>
                 <option value="гибрид">Гибрид</option>
               </select>
             </div>
@@ -221,6 +256,26 @@ const saveEdit = () => {
                 type="tel"
                 v-model="item.body.phone"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+              >
+            </div>
+            <!-- Ссылки (редактирование) -->
+            <div class="md:col-span-2 space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Ссылки (каждая с новой строки)</label>
+              <textarea
+                v-model="item.body.links"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                rows="3"
+                placeholder="https://example.com&#10;https://another-link.com"
+              ></textarea>
+            </div>
+            <!-- Резюме (редактирование) -->
+            <div class="md:col-span-2 space-y-1">
+              <label class="block text-sm font-medium text-gray-700">Путь к резюме</label>
+              <input
+                type="text"
+                v-model="item.body.pathToResume"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                placeholder="URL или путь к файлу резюме"
               >
             </div>
           </div>

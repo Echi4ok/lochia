@@ -1,3 +1,16 @@
+<script setup>
+import { ref } from 'vue'
+
+const showFilters = ref(false);
+
+const toggleFilters = () => {
+  showFilters.value = !showFilters.value
+}
+
+
+</script>
+
+
 <template>
   <div class="relative">
     <!-- Кнопка открытия фильтров -->
@@ -31,7 +44,7 @@
     >
       <div
         v-if="showFilters"
-        class="fixed left-4 top-20 z-20 w-80 rounded-lg bg-white p-4 shadow-xl ring-1 ring-purple-200"
+        class="fixed left-4 top-10 z-20 w-80 rounded-lg bg-white p-4 shadow-xl ring-1 ring-purple-200"
       >
         <!-- Поиск по имени -->
         <div class="mb-4">
@@ -43,15 +56,7 @@
           />
         </div>
 
-        <!-- Фильтр по email -->
-        <div class="mb-4">
-          <label class="mb-1 block text-sm font-medium">Email</label>
-          <input
-            type="email"
-            placeholder="Введите email"
-            class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 "
-          />
-        </div>
+      
 
         <!-- Фильтр по часам -->
         <div class="mb-4">
@@ -99,6 +104,48 @@
           />
           <p class="mt-1 text-xs ">Например: JavaScript, Python, Git</p>
         </div>
+
+        <!-- Фильтр по опыту работы -->
+<div class="mb-4">
+  <label class="mb-1 block text-sm font-medium">Опыт работы</label>
+  <div class="space-y-2">
+    <label class="flex items-center">
+      <input
+        type="checkbox"
+        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+      />
+      <span class="ml-2 text-sm">Нет опыта</span>
+    </label>
+    <label class="flex items-center">
+      <input
+        type="checkbox"
+        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+      />
+      <span class="ml-2 text-sm">До 1 года</span>
+    </label>
+    <label class="flex items-center">
+      <input
+        type="checkbox"
+        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+      />
+      <span class="ml-2 text-sm">1-3 года</span>
+    </label>
+    <label class="flex items-center">
+      <input
+        type="checkbox"
+        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+      />
+      <span class="ml-2 text-sm">3-5 лет</span>
+    </label>
+    <label class="flex items-center">
+      <input
+        type="checkbox"
+        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+      />
+      <span class="ml-2 text-sm">Более 5 лет</span>
+    </label>
+  </div>
+</div>
 
         <!-- Фильтр по типу занятости -->
         <div class="mb-4">
@@ -163,13 +210,3 @@
 
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-
-const showFilters = ref(false)
-
-const toggleFilters = () => {
-  showFilters.value = !showFilters.value
-}
-</script>

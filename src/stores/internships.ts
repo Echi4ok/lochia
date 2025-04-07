@@ -36,7 +36,8 @@ export const useInternStore = defineStore('interns', () => {
       internsArr.value = internsArr.value.filter((intern) => intern.id !== id)
       alert('Успешно удалено')
     }).catch((e) => {
-      console.log("Error")
+      console.error(e.message);
+      throw e;
     })
   }
   
@@ -48,7 +49,8 @@ export const useInternStore = defineStore('interns', () => {
       console.log(res.data)
       alert('Данные успешно обновлены');
     }).catch((e) => {
-      console.log("Error")
+      console.error(e.message);
+      throw e;
     })
   }
 
@@ -56,11 +58,23 @@ export const useInternStore = defineStore('interns', () => {
     console.log(createdItem)
     axios.post(`http://do.gberdyshev.tech:8080/api/v1/candidates`, createdItem)
     .then((res) => {
-      // internsArr.value.push(res.data)
+      internsArr.value.push(res.data[0])
       console.log(internsArr.value)
       alert('Успешно создан кандидат');
     }).catch((e) => {
-      console.log("Error")
+      console.error(e.message);
+      throw e;
+    })
+  }
+
+  function getFilteredInterns (params: Object) {
+    axios.get(`http://do.gberdyshev.tech:8080/api/v1/candidates`, params)
+    .then((res) => {
+      console.log(res)
+      alert('Получены отфильтрованный список стажеров');
+    }).catch((e) => {
+      console.error(e.message);
+      throw e;
     })
   }
 

@@ -2,7 +2,6 @@
 import { reactive, ref, watch } from 'vue'
 import ModalWindow from './ModalWindow.vue'
 import Filters from '@/components/Filters.vue'
-import CreateBtn from '@/components/CreateBtn.vue'
 import type { Intern } from '../types/types'
 
 import { useInternStore } from '@/stores/internships';
@@ -124,7 +123,7 @@ const creatingItem = () => {
             <td class="px-4 py-3 text-sm text-gray-600">{{ item.body.phone }}</td>
             <td class="px-4 py-3 text-sm text-center">
               <a 
-                :href="item.body.resume" 
+                :href="item.body.pathToResume" 
                 target="_blank"
                 class="text-purple-600 hover:text-purple-800"
                 @click.stop

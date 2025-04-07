@@ -8,7 +8,7 @@ export interface InternBody {
   name: string;
   phone: string;
   position: string;
-  resume: string;
+  pathToResume: string;
   skills: string;
 }
 
