@@ -1,13 +1,35 @@
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { reactive, ref, watch, computed } from 'vue'
+import { useInternStore } from '@/stores/internships';
 
+const internshipStore = useInternStore();
 const showFilters = ref(false);
 
 const toggleFilters = () => {
   showFilters.value = !showFilters.value
 }
 
+const employmentTypes = ref<Array<string>>([]);
+const skillsInput = ref<string>('');
+const nameInput = ref<string>('');
+const emailInput = ref<string>('');
+const telInput = ref<string>('');
 
+
+
+
+const filters = computed(() => ({
+  candidateEmploymentType: employmentTypes.value.join(','), // формат удаленка, гибрид или офис
+  candidateSkills: skillsInput.value, // скилы канлдидата по типу git, js и тп
+  candidateName: nameInput.value,
+  candidateEmail: emailInput.value,
+  candidatePhone: telInput.value,
+}));
+
+const sendFilters = () => {
+  console.log(filters.value.candidateSkills)
+  internshipStore.getFilteredInterns(filters.value);
+}
 </script>
 
 
@@ -33,8 +55,8 @@ const toggleFilters = () => {
       Фильтры
     </button>
 
-    <!-- Панель фильтров -->
-    <transition
+     <!-- Панель фильтров -->
+     <transition
       enter-active-class="transition-all duration-300 ease-out"
       enter-from-class="transform -translate-x-full opacity-0"
       enter-to-class="transform translate-x-0 opacity-100"
@@ -45,29 +67,50 @@ const toggleFilters = () => {
       <div
         v-if="showFilters"
         class="fixed left-4 top-10 z-20 w-80 rounded-lg bg-white p-4 shadow-xl ring-1 ring-purple-200"
+        style="max-height: 90vh; overflow-y: auto;" 
       >
         <!-- Поиск по имени -->
         <div class="mb-4">
-          <label class="mb-1 block text-sm font-medium ">Поиск по имени</label>
+          <label class="mb-1 block text-sm font-medium">Поиск по имени</label>
           <input
+            v-model="nameInput"
             type="text"
             placeholder="Введите имя"
-            class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 "
+            class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           />
         </div>
 
-      
+         <!-- Новые поля: Email и Телефон -->
+         <div class="mb-4">
+          <label class="mb-1 block text-sm font-medium">Email</label>
+          <input
+            v-model="emailInput"
+            type="email"
+            placeholder="Введите email"
+            class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+          />
+        </div>
 
-        <!-- Фильтр по часам -->
         <div class="mb-4">
-          <label class="mb-1 block text-sm font-medium ">Часов в неделю</label>
+          <label class="mb-1 block text-sm font-medium">Телефон</label>
+          <input
+            v-model="telInput"
+            type="tel"
+            placeholder="Введите телефон"
+            class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+          />
+        </div>
+
+         <!-- Фильтр по часам -->
+         <div class="mb-4">
+          <label class="mb-1 block text-sm font-medium">Часов в неделю</label>
           <div class="flex items-center gap-2">
             <input
               type="number"
               placeholder="От"
-              class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 "
+              class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
             />
-            <span class="">-</span>
+            <span>-</span>
             <input
               type="number"
               placeholder="До"
@@ -98,6 +141,7 @@ const toggleFilters = () => {
         <div class="mb-4">
           <label class="mb-1 block text-sm font-medium ">Навыки</label>
           <input
+            v-model="skillsInput"
             type="text"
             placeholder="Введите навыки через запятую"
             class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -153,6 +197,8 @@ const toggleFilters = () => {
           <div class="space-y-2">
             <label class="flex items-center">
               <input
+                v-model="employmentTypes"
+                value="офис"
                 type="checkbox"
                 class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
               />
@@ -160,6 +206,8 @@ const toggleFilters = () => {
             </label>
             <label class="flex items-center">
               <input
+                v-model="employmentTypes"
+                value="удалённо"
                 type="checkbox"
                 class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
               />
@@ -167,6 +215,8 @@ const toggleFilters = () => {
             </label>
             <label class="flex items-center">
               <input
+                v-model="employmentTypes"
+                value="гибрид"
                 type="checkbox"
                 class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
               />
@@ -176,14 +226,15 @@ const toggleFilters = () => {
         </div>
 
         <!-- Кнопки действий -->
-        <div class="flex justify-end gap-2">
+        <div class="flex justify-end gap-2 sticky bottom-0 bg-white pt-2">
           <button
-            class="rounded-md bg-purple-100 px-4 py-2 text-sm font-medium  hover:bg-purple-200"
+            class="rounded-md bg-purple-100 px-4 py-2 text-sm font-medium hover:bg-purple-200"
           >
             Сбросить
           </button>
           <button
             class="rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+            @click="sendFilters()"
           >
             Применить
           </button>

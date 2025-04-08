@@ -27,7 +27,7 @@ let item = computed(() => {
           skills: "JavaScript, Python",       // строка
           experience: "1 год",                // строка
           hoursPerWeek: 20,                   // число, min:20, max:40
-          employmentType: "удалённо",        // enum: ["in-office", "remote", "hybrid"]
+          employmentType: "удалённо",        // enum: ["в офисе", "гибрид", "удалённо"]
           links: "https://gвавпыамdfsithub.com/user",   // строка (опционально)
           pathToResume: "wedfqwec"       // строка (опционально)
         }
@@ -237,7 +237,7 @@ const saveEdit = () => {
                 v-model="item.body.employmentType"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               >
-                <option value="очно">Очно</option>
+                <option value="в офисе">В офисе</option>
                 <option value="удалённо">Удалённо</option>
                 <option value="гибрид">Гибрид</option>
               </select>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import ModalWindow from './ModalWindow.vue'
-import Filters from '@/components/Filters.vue'
+import Filters from './Filters.vue';
 import type { Intern } from '../types/types'
-
 import { useInternStore } from '@/stores/internships';
+
 
 
 
@@ -43,6 +43,7 @@ watch(() => props.items, () => {
 })
 
 const showId = (id: string) => {
+    console.log(itemId)
     itemId.value = id;
     isShowingWindow();
 }
@@ -56,14 +57,12 @@ const creatingItem = () => {
   isShowingWindow();
 }
 
-
-
-
 </script>
 
 <template>
   <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
     <!-- Заголовочная строка с фильтрами и кнопкой -->
+
     <div class="flex items-center justify-between mb-4 gap-4">
       <Filters class="flex-grow"/>
       <button

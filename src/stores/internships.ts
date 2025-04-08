@@ -12,7 +12,7 @@ export interface InternBody {
   name: string;
   phone: string;
   position: string;
-  resume: string;
+  pathToResume: string;
   skills: string;
 }
 
@@ -24,7 +24,7 @@ export const useInternStore = defineStore('interns', () => {
     axios.get('http://do.gberdyshev.tech:8080/api/v1/candidates')
     .then((res) => {
         internsArr.value = res.data.data;
-        console.log(res.data.data)
+        console.log(res.data)
     }).catch((e) => {
       console.log(e.message)
     })
@@ -67,11 +67,12 @@ export const useInternStore = defineStore('interns', () => {
     })
   }
 
-  function getFilteredInterns (params: Object) {
-    axios.get(`http://do.gberdyshev.tech:8080/api/v1/candidates`, params)
+  function getFilteredInterns (filters: Object) {
+    axios.get(`http://do.gberdyshev.tech:8080/api/v1/candidates`, {params: filters})
     .then((res) => {
-      console.log(res)
-      alert('Получены отфильтрованный список стажеров');
+      console.log(res.data.data)
+      internsArr.value = res.data.data;
+      
     }).catch((e) => {
       console.error(e.message);
       throw e;
@@ -80,5 +81,5 @@ export const useInternStore = defineStore('interns', () => {
 
 
     onMounted(getInterns);
-  return { getInterns, internsArr, deleteInterns, patchIntern, postIntern }
+  return { getInterns, internsArr, deleteInterns, patchIntern, postIntern, getFilteredInterns }
 })
