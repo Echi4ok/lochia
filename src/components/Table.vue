@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { handleError, onMounted, reactive, ref, watch } from 'vue'
 import ModalWindow from './ModalWindow.vue'
 import Filters from './Filters.vue';
 import type { Intern } from '../types/types'
@@ -36,11 +36,24 @@ const displayedItems = ref<Intern[]>([]);
 
 
 displayedItems.value = props.items
+let countPage = ref<number>();
+let currentPage = ref(1)
 
-console.log(displayedItems.value)
 watch(() => props.items, () => {
-  displayedItems.value = props.items
+  displayedItems.value = props.items;
+  if(displayedItems.value.length) {
+    countPage.value = Math.ceil(internshipStore.resPagination.total / 10)
+  }
 })
+
+const handleClick = (btn: number) => {
+  currentPage.value = btn + 1;
+  let pagination = reactive({
+    limit: 10, // константа
+    offset: (btn - 1) * 10,
+  })
+  internshipStore.getInterns(pagination)
+}
 
 const showId = (id: string) => {
     console.log(itemId)
@@ -57,14 +70,30 @@ const creatingItem = () => {
   isShowingWindow();
 }
 
+handleClick(1);
 </script>
 
 <template>
-  <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
-    <!-- Заголовочная строка с фильтрами и кнопкой -->
-
+   <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
     <div class="flex items-center justify-between mb-4 gap-4">
       <Filters class="flex-grow"/>
+      
+      <!-- Пагинация - минимальная версия -->
+      <div class="flex gap-1">
+        <button 
+          v-for="btn in countPage" 
+          :key="btn"
+          @click="handleClick(btn)"
+          class="w-8 h-8 flex items-center justify-center rounded border"
+          :class="{
+            'bg-purple-600 text-white border-purple-600': currentPage === btn + 1,
+            'bg-white border-gray-300 hover:bg-gray-50': currentPage !== btn + 1
+          }"
+        >
+          {{ btn }}
+        </button>
+      </div>
+
       <button
         @click="creatingItem()"
         class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm flex items-center whitespace-nowrap"

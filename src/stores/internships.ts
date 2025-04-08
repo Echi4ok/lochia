@@ -1,4 +1,4 @@
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import type { Intern } from '../types/types';
@@ -17,14 +17,25 @@ export interface InternBody {
 }
 
 export const useInternStore = defineStore('interns', () => {
-  let internsArr = ref<Intern[]>([]);
+  let internsArr = ref<Intern[]>([]); // массив данных
+  let resPagination = reactive({}); // пагинация
+  let currentFilters = reactive({}); // фильтры
 
 
-  function getInterns () {
-    axios.get('http://do.gberdyshev.tech:8080/api/v1/candidates')
+  function setFilters (filters: any) { // получение фильтров
+    Object.assign(currentFilters, filters)
+  }
+
+  function getInterns (pagination: any) {
+    axios.get('http://do.gberdyshev.tech:8080/api/v1/candidates', {
+      params: {
+        ...pagination,
+        ...currentFilters,
+      }
+    })
     .then((res) => {
         internsArr.value = res.data.data;
-        console.log(res.data)
+        Object.assign(resPagination, res.data.pagination)
     }).catch((e) => {
       console.log(e.message)
     })
@@ -81,5 +92,5 @@ export const useInternStore = defineStore('interns', () => {
 
 
     onMounted(getInterns);
-  return { getInterns, internsArr, deleteInterns, patchIntern, postIntern, getFilteredInterns }
+  return { getInterns, internsArr, deleteInterns, patchIntern, postIntern, getFilteredInterns, resPagination, currentFilters, setFilters }
 })
