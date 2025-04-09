@@ -18,24 +18,43 @@ export interface InternBody {
 
 export const useInternStore = defineStore('interns', () => {
   let internsArr = ref<Intern[]>([]); // массив данных
-  let resPagination = reactive({}); // пагинация
-  let currentFilters = reactive({}); // фильтры
+
+  let setFilters = reactive({}); // фильтры по дефолту будет передаваться этот обьект 
+
+  let setPagination = reactive({
+    limit: 10,
+    offset: 0,
+  }); // пагинация по дефолту будет передаваться этот обьект 
+
+  let setSort = reactive({
+    sortBy: '',
+    sortOrder: 'asc'
+  }) // сортировка по дефолту будет передаваться этот обьект 
 
 
-  function setFilters (filters: any) { // получение фильтров
-    Object.assign(currentFilters, filters)
+  function getFilters (filters: any) { // получение фильтров
+    Object.assign(setFilters, filters)
   }
 
-  function getInterns (pagination: any) {
+  function getPagination (pagination: any) { // получение пагинации
+    Object.assign(setPagination, pagination)
+  }
+
+  function getSort (sort: any) { // получение сортировки
+    Object.assign(setSort, sort)
+  }
+
+  function getInterns (filters: any, pagination: any, sort: any) {
     axios.get('http://do.gberdyshev.tech:8080/api/v1/candidates', {
       params: {
         ...pagination,
-        ...currentFilters,
+        ...filters,
+        ...sort,
       }
     })
     .then((res) => {
         internsArr.value = res.data.data;
-        Object.assign(resPagination, res.data.pagination)
+        Object.assign(setPagination, res.data.pagination)
     }).catch((e) => {
       console.log(e.message)
     })
@@ -92,5 +111,17 @@ export const useInternStore = defineStore('interns', () => {
 
 
     onMounted(getInterns);
-  return { getInterns, internsArr, deleteInterns, patchIntern, postIntern, getFilteredInterns, resPagination, currentFilters, setFilters }
+  return { getInterns, 
+    internsArr, 
+    setFilters,
+    setPagination,
+    setSort,
+    deleteInterns, 
+    patchIntern, 
+    postIntern, 
+    getFilteredInterns, 
+    getFilters, 
+    getPagination, 
+    getSort,
+  }
 })

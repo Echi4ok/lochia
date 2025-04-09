@@ -6,7 +6,18 @@ import type { Intern } from '../types/types'
 import { useInternStore } from '@/stores/internships';
 
 
-
+const headers = ref([
+  { title: 'Имя', key: 'name', width: 'w-[12%]', sortable: true },
+  { title: 'Должность', key: 'position', width: 'w-[12%]', sortable: true },
+  { title: 'Образование', key: 'education', width: 'w-[10%]', sortable: false },
+  { title: 'Навыки', key: 'skills', width: 'w-[14%]', sortable: true },
+  { title: 'Опыт', key: 'experience', width: 'w-[8%]', sortable: true },
+  { title: 'Часы/нед', key: 'hoursPerWeek', width: 'w-[8%]', sortable: true },
+  { title: 'Занятость', key: 'employmentType', width: 'w-[10%]', sortable: false },
+  { title: 'Email', key: 'email', width: 'w-[12%]', sortable: true },
+  { title: 'Телефон', key: 'phone', width: 'w-[10%]', sortable: false },
+  { title: 'Резюме', key: 'resume', width: 'w-[4%]', sortable: false }
+])
 
 
 const internshipStore = useInternStore();
@@ -18,21 +29,9 @@ const props = defineProps<{
 
 let isOpenMenu = ref<boolean>(false);
 let itemId = ref<string>();
-const store = ref<string>("стажера");
+let activeSortField = ref(false);
 const displayedItems = ref<Intern[]>([]);
-//   const createdItem = reactive({
-//     education: "new",
-//     email: "newname2@example.com",
-//     employmentType: "remo123te",
-//     experience: "2",
-//     hoursPerWeek: 25, 
-//     links: "meow",
-//     name: "Alic123e Smith",
-//     phone: "666",
-//     position: "IT",
-//     resume: "/d/d/d",
-//     skills: "JavaScript",
-// })
+
 
 
 displayedItems.value = props.items
@@ -42,7 +41,7 @@ let currentPage = ref(1)
 watch(() => props.items, () => {
   displayedItems.value = props.items;
   if(displayedItems.value.length) {
-    countPage.value = Math.ceil(internshipStore.resPagination.total / 10)
+    countPage.value = Math.ceil(internshipStore.setPagination.total / 10)
   }
 })
 
@@ -52,7 +51,8 @@ const handleClick = (btn: number) => {
     limit: 10, // константа
     offset: (btn - 1) * 10,
   })
-  internshipStore.getInterns(pagination)
+  internshipStore.getPagination(pagination);
+  internshipStore.getInterns(internshipStore.setFilters, internshipStore.setPagination, internshipStore.setSort)
 }
 
 const showId = (id: string) => {
@@ -71,6 +71,20 @@ const creatingItem = () => {
 }
 
 handleClick(1);
+
+
+const sortedBy = (param: string, order: string) => {
+    const sortedObj = reactive({
+      sortBy: param,
+      sortOrder: order,
+    })
+    console.log(sortedObj)
+    internshipStore.getSort(sortedObj)
+    internshipStore.getInterns(internshipStore.setFilters, internshipStore.setPagination, internshipStore.setSort)
+}
+
+
+
 </script>
 
 <template>
@@ -115,22 +129,36 @@ handleClick(1);
       :isOpenMenu="isOpenMenu"
       :storeType="props.storeType"
       />
-      <table class="w-full">
+      <table class="w-full table-fixed">
         <!-- Заголовки таблицы -->
         <thead class="bg-gray-50">
-          <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-[12%]">Имя</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-[12%]">Должность</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-[10%]">Образование</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-[14%]">Навыки</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-[8%]">Опыт</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-[8%]">Часы/нед</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-[10%]">Занятость</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-[12%]">Email</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-[10%]">Телефон</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-[4%]">Резюме</th>
-          </tr>
-        </thead>
+    <tr>
+      <th 
+        v-for="header in headers" 
+        :key="header.key"
+        class='px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider hover:bg-gray-100 '
+      >
+        <div class="flex items-center justify-between">
+          <span>{{ header.title }}</span>
+          <div 
+            v-if="header.sortable" 
+            class="flex flex-col ml-2 space-y-0.5"
+          >
+            <span 
+              class="text-xl transition-colors cursor-pointer"
+              @click="sortedBy(header.key, 'asc')"
+            >↑
+          </span>
+            <span 
+              class="text-xl transition-colors cursor-pointer"
+              @click="sortedBy(header.key, 'dsc')"
+            >↓</span>
+          </div>
+        </div>
+      </th>
+    </tr>
+  </thead>
+
 
         <!-- Данные таблицы -->
         <tbody class="bg-white divide-y divide-gray-200">
@@ -138,7 +166,7 @@ handleClick(1);
             v-for="item in displayedItems" 
             :key="item.id" 
             @click="showId(item.id)"
-            class="hover:bg-gray-50 cursor-pointer transition-colors"
+            class="hover:bg-gray-50 cursor-pointer transition-colors "
           >
             <td class="px-4 py-3 text-sm font-medium text-gray-900 truncate">{{ item.body.name }}</td>
             <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.body.position }}</td>

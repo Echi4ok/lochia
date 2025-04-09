@@ -28,8 +28,8 @@ const filters = computed(() => ({
 
 const sendFilters = () => {
   console.log(filters.value.candidateSkills)
-  internshipStore.setFilters(filters.value);
-  internshipStore.getInterns({})
+  internshipStore.getFilters(filters.value);
+  internshipStore.getInterns(internshipStore.setFilters, internshipStore.setPagination, internshipStore.setSort)
 }
 </script>
 
