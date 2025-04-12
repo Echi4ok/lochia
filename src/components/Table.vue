@@ -1,98 +1,82 @@
 <script setup lang="ts">
-import { handleError, onMounted, reactive, ref, watch } from 'vue'
+import { handleError, onMounted, reactive, ref, watch, computed } from 'vue'
 import ModalWindow from './ModalWindow.vue'
-import Filters from './Filters.vue';
-import type { Intern } from '../types/types'
-import { useInternStore } from '@/stores/internships';
+import Filters from './Filters.vue'
+import type { Intern, Internship } from '../types/types'
+import { useInternStore } from '@/stores/intern'
+import { useInternshipsStore } from '@/stores/internships'
 
+// Определяем нужное хранилище на основе props.storeType
 
-const headers = ref([
-  { title: 'Имя', key: 'name', width: 'w-[12%]', sortable: true },
-  { title: 'Должность', key: 'position', width: 'w-[12%]', sortable: true },
-  { title: 'Образование', key: 'education', width: 'w-[10%]', sortable: false },
-  { title: 'Навыки', key: 'skills', width: 'w-[14%]', sortable: true },
-  { title: 'Опыт', key: 'experience', width: 'w-[8%]', sortable: true },
-  { title: 'Часы/нед', key: 'hoursPerWeek', width: 'w-[8%]', sortable: true },
-  { title: 'Занятость', key: 'employmentType', width: 'w-[10%]', sortable: false },
-  { title: 'Email', key: 'email', width: 'w-[12%]', sortable: true },
-  { title: 'Телефон', key: 'phone', width: 'w-[10%]', sortable: false },
-  { title: 'Резюме', key: 'resume', width: 'w-[4%]', sortable: false }
-])
-
-
-const internshipStore = useInternStore();
 
 const props = defineProps<{
-  items: Intern[],
-  storeType: "internship" | "candidate", 
-}>();
+  items: Intern[] | Internship[],
+  storeType: "intern" | "internship", 
+  headers: any,
+}>()
 
-let isOpenMenu = ref<boolean>(false);
-let itemId = ref<string>();
-let activeSortField = ref(false);
-const displayedItems = ref<Intern[]>([]);
+const store = computed(() => {
+  return props.storeType === 'intern' ? useInternStore() : useInternshipsStore()
+})
 
-
+let isOpenMenu = ref<boolean>(false)
+let itemId = ref<string>()
+let activeSortField = ref(false)
+const displayedItems = ref<any>([])
 
 displayedItems.value = props.items
-let countPage = ref<number>();
+let countPage = ref<number>()
 let currentPage = ref(1)
 
 watch(() => props.items, () => {
-  displayedItems.value = props.items;
+  displayedItems.value = props.items
   if(displayedItems.value.length) {
-    countPage.value = Math.ceil(internshipStore.setPagination.total / 10)
+    countPage.value = Math.ceil(store.value.setPagination.total / 10)
   }
 })
 
 const handleClick = (btn: number) => {
-  currentPage.value = btn + 1;
+  currentPage.value = btn + 1
   let pagination = reactive({
-    limit: 10, // константа
+    limit: 10,
     offset: (btn - 1) * 10,
   })
-  internshipStore.getPagination(pagination);
-  internshipStore.getInterns(internshipStore.setFilters, internshipStore.setPagination, internshipStore.setSort)
+  store.value.getPagination(pagination)
+  store.value.getInterns(store.value.setFilters, store.value.setPagination, store.value.setSort)
 }
 
 const showId = (id: string) => {
-    console.log(itemId)
-    itemId.value = id;
-    isShowingWindow();
+  itemId.value = id
+  isShowingWindow()
 }
 
 const isShowingWindow = () => {
-    isOpenMenu.value = !isOpenMenu.value;
+  isOpenMenu.value = !isOpenMenu.value
 }
 
 const creatingItem = () => {
-  itemId.value = undefined;
-  isShowingWindow();
+  itemId.value = undefined
+  isShowingWindow()
 }
 
-handleClick(1);
-
+handleClick(1)
 
 const sortedBy = (param: string, order: string) => {
-    const sortedObj = reactive({
-      sortBy: param,
-      sortOrder: order,
-    })
-    console.log(sortedObj)
-    internshipStore.getSort(sortedObj)
-    internshipStore.getInterns(internshipStore.setFilters, internshipStore.setPagination, internshipStore.setSort)
+  const sortedObj = reactive({
+    sortBy: param,
+    sortOrder: order,
+  })
+  store.value.getSort(sortedObj)
+  store.value.getInterns(store.value.setFilters, store.value.setPagination, store.value.setSort)
 }
-
-
-
 </script>
 
 <template>
-   <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
+  <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
     <div class="flex items-center justify-between mb-4 gap-4">
-      <Filters class="flex-grow"/>
+      <Filters class="flex-grow" :store="props.storeType"/>
       
-      <!-- Пагинация - минимальная версия -->
+      <!-- Пагинация -->
       <div class="flex gap-1">
         <button 
           v-for="btn in countPage" 
@@ -115,28 +99,29 @@ const sortedBy = (param: string, order: string) => {
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
-        Добавить стажера
+        {{ storeType === 'intern' ? 'Добавить кандидата' : 'Добавить стажировку' }}
       </button>
     </div>
 
-
     <!-- Таблица -->
     <div class="table-container border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-      <ModalWindow v-if="isOpenMenu"
-      :itemId="itemId" 
-      :items="props.items" 
-      :isShowingWindow="isShowingWindow" 
-      :isOpenMenu="isOpenMenu"
-      :storeType="props.storeType"
+      <ModalWindow 
+        v-if="isOpenMenu"
+        :itemId="itemId" 
+        :items="props.items" 
+        :isShowingWindow="isShowingWindow" 
+        :isOpenMenu="isOpenMenu"
+        :storeType="props.storeType"
       />
+      
       <table class="w-full table-fixed">
-        <!-- Заголовки таблицы -->
-        <thead class="bg-gray-50">
+  <!-- Table Headers -->
+  <thead class="bg-gray-50">
     <tr>
       <th 
-        v-for="header in headers" 
+        v-for="header in props.headers" 
         :key="header.key"
-        class='px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider hover:bg-gray-100 '
+        :class="['px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider hover:bg-gray-100', header.width]"
       >
         <div class="flex items-center justify-between">
           <span>{{ header.title }}</span>
@@ -147,8 +132,7 @@ const sortedBy = (param: string, order: string) => {
             <span 
               class="text-xl transition-colors cursor-pointer"
               @click="sortedBy(header.key, 'asc')"
-            >↑
-          </span>
+            >↑</span>
             <span 
               class="text-xl transition-colors cursor-pointer"
               @click="sortedBy(header.key, 'dsc')"
@@ -159,39 +143,90 @@ const sortedBy = (param: string, order: string) => {
     </tr>
   </thead>
 
-
-        <!-- Данные таблицы -->
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr 
-            v-for="item in displayedItems" 
-            :key="item.id" 
-            @click="showId(item.id)"
-            class="hover:bg-gray-50 cursor-pointer transition-colors "
-          >
-            <td class="px-4 py-3 text-sm font-medium text-gray-900 truncate">{{ item.body.name }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.body.position }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.body.education }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.body.skills }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 text-center">{{ item.body.experience }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 text-center">{{ item.body.hoursPerWeek }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 capitalize">{{ item.body.employmentType }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600 truncate">{{ item.body.email }}</td>
-            <td class="px-4 py-3 text-sm text-gray-600">{{ item.body.phone }}</td>
-            <td class="px-4 py-3 text-sm text-center">
-              <a 
-                :href="item.body.pathToResume" 
-                target="_blank"
-                class="text-purple-600 hover:text-purple-800"
-                @click.stop
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- Table Body -->
+  <tbody class="bg-white divide-y divide-gray-200">
+    <tr 
+      v-for="item in displayedItems" 
+      :key="item.id" 
+      @click="showId(item.id)"
+      class="hover:bg-gray-50 cursor-pointer transition-colors"
+    >
+      <!-- Position/Name (first column differs between views) -->
+      <td class="px-4 py-3 text-sm font-medium text-gray-900 truncate" :class="storeType === 'intern' ? 'w-[12%]' : 'w-[15%]'">
+        {{ storeType === 'intern' ? item.body.name : item.body.position }}
+      </td>
+      
+      <!-- Department/Position (second column differs) -->
+      <td class="px-4 py-3 text-sm text-gray-600 truncate" :class="storeType === 'intern' ? 'w-[12%]' : 'w-[12%]'">
+        {{ storeType === 'intern' ? item.body.position : item.body.department }}
+      </td>
+      
+      <!-- Education (same for both) -->
+      <td class="px-4 py-3 text-sm text-gray-600 truncate" :class="storeType === 'intern' ? 'w-[10%]' : 'w-[12%]'">
+        {{ item.body.education }}
+      </td>
+      
+      <!-- Skills (same for both) -->
+      <td class="px-4 py-3 text-sm text-gray-600 truncate" :class="storeType === 'intern' ? 'w-[14%]' : 'w-[15%]'">
+        {{ item.body.skills }}
+      </td>
+      
+      <!-- Experience (only for intern) or Hours (for both) -->
+      <td class="px-4 py-3 text-sm text-gray-600 text-center" :class="storeType === 'intern' ? 'w-[8%]' : 'w-[8%]'">
+        {{ storeType === 'intern' ? item.body.experience : item.body.hoursPerWeek }}
+      </td>
+      
+      <!-- Hours per week (only for intern) -->
+      <td v-if="storeType === 'intern'" class="px-4 py-3 text-sm text-gray-600 text-center w-[8%]">
+        {{ item.body.hoursPerWeek }}
+      </td>
+      
+      <!-- Employment type (same for both) -->
+      <td class="px-4 py-3 text-sm text-gray-600 capitalize" :class="storeType === 'intern' ? 'w-[10%]' : 'w-[10%]'">
+        {{ item.body.employmentType }}
+      </td>
+      
+      <!-- Description (for internship) or Email (for intern) -->
+      <td class="px-4 py-3 text-sm text-gray-600 truncate" :class="storeType === 'intern' ? 'w-[12%]' : 'w-[20%]'">
+        {{ storeType === 'intern' ? item.body.email : item.body.description }}
+      </td>
+      
+      <!-- Status (for internship) or Phone (for intern) -->
+      <td class="px-4 py-3 text-sm text-gray-600 truncate" :class="storeType === 'intern' ? 'w-[10%]' : 'w-[10%]'">
+        <template v-if="storeType === 'intern'">
+          {{ item.body.phone }}
+        </template>
+        <template v-else>
+          <span :class="{
+            'bg-blue-100 text-blue-800': item.body.status === 'новое',
+            'bg-yellow-100 text-yellow-800': item.body.status === 'в рассмотрении',
+            'bg-green-100 text-green-800': item.body.status === 'приглашение',
+            'bg-gray-100 text-gray-800': item.body.status === 'просмотрено',
+            'bg-red-100 text-red-800': item.body.status === 'отклонено',
+            'bg-orange-100 text-orange-800': item.body.status === 'отложенно',
+            'bg-black-100 text-black-800': item.body.status === 'заблокировано'
+          }" class="px-2 py-1 rounded-full text-xs font-medium">
+            {{ item.body.status }}
+          </span>
+        </template>
+      </td>
+      
+      <!-- Resume link (only for intern) -->
+      <td v-if="storeType === 'intern'" class="px-4 py-3 text-sm text-center w-[4%]">
+        <a 
+          :href="item.body.pathToResume" 
+          target="_blank"
+          class="text-purple-600 hover:text-purple-800"
+          @click.stop
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
     </div>
   </div>
 </template>

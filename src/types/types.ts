@@ -1,21 +1,38 @@
 export interface InternBody {
   education: string;
   email: string;
-  employmentType: string;
+  employmentType: 'в офисе' | 'удалённо' | 'гибрид';
   experience: string;
   hoursPerWeek: number;
-  links: string;
+  links?: string;
   name: string;
   phone: string;
   position: string;
-  pathToResume: string;
+  pathToResume?: string;
   skills: string;
 }
 
 export interface Intern {
+  id: string;
   body: InternBody;
-  id: string; 
 }
+
+export interface Internship {
+  id: string;
+  body: InternshipBody,
+}
+
+export interface InternshipBody {
+  skills: string;
+  education: string;
+  hoursPerWeek: number;
+  employmentType: 'в офисе' | 'удалённо' | 'гибрид';
+  description: string;
+  position: string;
+  department: string;
+  status: 'просмотрено' | 'ждет ответа' | 'отклонено';
+}
+
 
 
 // export interface FlatCandidate {

@@ -16,8 +16,8 @@ export interface InternBody {
   skills: string;
 }
 
-export const useInternshipsStore = defineStore('internships', () => {
-  let internshipsArr = ref<any>([]); // массив данных
+export const useInternStore = defineStore('interns', () => {
+  let internsArr = ref<Intern[]>([]); // массив данных
 
   let setFilters = reactive({}); // фильтры по дефолту будет передаваться этот обьект 
 
@@ -45,7 +45,7 @@ export const useInternshipsStore = defineStore('internships', () => {
   }
 
   function getInterns (filters: any, pagination: any, sort: any) {
-    axios.get('http://do.gberdyshev.tech:8080/api/v1/internships', {
+    axios.get('http://do.gberdyshev.tech:8080/api/v1/candidates', {
       params: {
         ...pagination,
         ...filters,
@@ -53,7 +53,7 @@ export const useInternshipsStore = defineStore('internships', () => {
       }
     })
     .then((res) => {
-        internshipsArr.value = res.data.data;
+        internsArr.value = res.data.data;
         Object.assign(setPagination, res.data.pagination)
     }).catch((e) => {
       console.log(e.message)
@@ -61,9 +61,9 @@ export const useInternshipsStore = defineStore('internships', () => {
   }
 
   function deleteInterns (id : string) {
-    axios.delete(`http://do.gberdyshev.tech:8080/api/v1/internships/${id}`)
+    axios.delete(`http://do.gberdyshev.tech:8080/api/v1/candidates/${id}`)
     .then((res) => {
-        internshipsArr.value = internshipsArr.value.filter((intern: Intern) => intern.id !== id)
+      internsArr.value = internsArr.value.filter((intern) => intern.id !== id)
       alert('Успешно удалено')
     }).catch((e) => {
       console.error(e.message);
@@ -74,7 +74,7 @@ export const useInternshipsStore = defineStore('internships', () => {
 
   function patchIntern (id: string, updatedItem: InternBody) {
     console.log(id, updatedItem)
-    axios.put(`http://do.gberdyshev.tech:8080/api/v1/internships/${id}`, updatedItem)
+    axios.put(`http://do.gberdyshev.tech:8080/api/v1/candidates/${id}`, updatedItem)
     .then((res) => {
       console.log(res.data)
       alert('Данные успешно обновлены');
@@ -86,10 +86,10 @@ export const useInternshipsStore = defineStore('internships', () => {
 
   function postIntern (createdItem: InternBody) {
     console.log(createdItem)
-    axios.post(`http://do.gberdyshev.tech:8080/api/v1/internships`, createdItem)
+    axios.post(`http://do.gberdyshev.tech:8080/api/v1/candidates`, createdItem)
     .then((res) => {
-        internshipsArr.value.push(res.data[0])
-      console.log(internshipsArr.value)
+      internsArr.value.push(res.data[0])
+      console.log(internsArr.value)
       alert('Успешно создан кандидат');
     }).catch((e) => {
       console.error(e.message);
@@ -97,28 +97,29 @@ export const useInternshipsStore = defineStore('internships', () => {
     })
   }
 
-//   function getFilteredInterns (filters: Object) {
-//     axios.get(`http://do.gberdyshev.tech:8080/api/v1/candidates`, {params: filters})
-//     .then((res) => {
-//       console.log(res.data.data)
-//       internsArr.value = res.data.data;
+  function getFilteredInterns (filters: Object) {
+    axios.get(`http://do.gberdyshev.tech:8080/api/v1/candidates`, {params: filters})
+    .then((res) => {
+      console.log(res.data.data)
+      internsArr.value = res.data.data;
       
-//     }).catch((e) => {
-//       console.error(e.message);
-//       throw e;
-//     })
-//   }
+    }).catch((e) => {
+      console.error(e.message);
+      throw e;
+    })
+  }
 
 
     onMounted(getInterns);
   return { getInterns, 
-    internshipsArr, 
+    internsArr, 
     setFilters,
     setPagination,
     setSort,
     deleteInterns, 
     patchIntern, 
     postIntern, 
+    getFilteredInterns, 
     getFilters, 
     getPagination, 
     getSort,

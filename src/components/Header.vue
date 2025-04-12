@@ -16,28 +16,28 @@
       <nav :class="{'flex': isMenuOpen, 'hidden': !isMenuOpen}" class="md:flex md:space-x-6 flex-col md:flex-row absolute md:relative top-16 md:top-0 left-0 w-full md:w-auto bg-purple-900 md:bg-transparent p-4 md:p-0">
         <router-link
           to="/"
-          class="relative text-white hover:text-orange-400 transition-colors duration-300 group block md:inline-block py-2 md:py-0"
-          active-class="text-orange-400"
+          class="relative text-white transition-colors duration-300 group block md:inline-block py-2 md:py-0"
+          active-class="text-orange-800 font-bold"
         >
           Хоум
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-400 transition-all duration-300 group-hover:w-full"></span>
         </router-link>
         <router-link
           to="/intern"
-          class="relative text-white hover:text-orange-400 transition-colors duration-300 group block md:inline-block py-2 md:py-0"
-          active-class="text-orange-400"
+          class="relative text-white transition-colors duration-300 group block md:inline-block py-2 md:py-0"
+          active-class="text-orange-400 font-bold "  
         >
           Стажеры
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-400 transition-all duration-300 group-hover:w-full"></span>
         </router-link>
-        <!-- <router-link
-          to="/candidate"
-          class="relative text-white hover:text-orange-400 transition-colors duration-300 group block md:inline-block py-2 md:py-0"
-          active-class="text-orange-400"
+        <router-link
+          to="/internship"
+          class="relative text-white  transition-colors duration-300 group block md:inline-block py-2 md:py-0"
+          active-class="text-orange-400 font-bold"  
         >
-          Кандидаты
+          Стажировки
           <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-400 transition-all duration-300 group-hover:w-full"></span>
-        </router-link> -->
+        </router-link>
       </nav>
     </div>
   </header>
@@ -54,5 +54,5 @@ const toggleMenu = () => {
 </script>
 
 <style scoped>
-/* Дополнительные стили, если необходимо */
+/* Если необходимо, добавьте другие стили */
 </style>
