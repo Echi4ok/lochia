@@ -1,40 +1,56 @@
 <script setup lang="ts">
 import { reactive, ref, watch, computed } from 'vue'
 import { useInternStore } from '@/stores/intern';
+import { useInternshipsStore } from '@/stores/internships'
+
 
 const props = defineProps<{
   store: string,
 }>()
 
+const store = props.store === 'intern' ? useInternStore() : useInternshipsStore()
 
-const internshipStore = useInternStore();
+
 const showFilters = ref(false);
 
 const toggleFilters = () => {
   showFilters.value = !showFilters.value
 }
-
+// фильтры стажеров
 const employmentTypes = ref<Array<string>>([]);
 const skillsInput = ref<string>('');
 const nameInput = ref<string>('');
 const emailInput = ref<string>('');
 const telInput = ref<string>('');
+// фильтры стажировок
+const positionSearch = ref<string>('');
+const departmentSearch = ref<string>('');
 
 
 
-
-const filters = computed(() => ({
-  candidateEmploymentType: employmentTypes.value.join(','), // формат удаленка, гибрид или офис
-  candidateSkills: skillsInput.value, // скилы канлдидата по типу git, js и тп
-  candidateName: nameInput.value,
-  candidateEmail: emailInput.value,
-  candidatePhone: telInput.value,
-}));
+const filters = computed(() => {
+  if (props.store === 'intern') {
+    return {
+      // фильтры стажеров
+      candidateEmploymentType: employmentTypes.value.join(','),
+      candidateSkills: skillsInput.value,
+      candidateName: nameInput.value,
+      candidateEmail: emailInput.value,
+      candidatePhone: telInput.value,
+    };
+  } else {
+    return {
+      // фильтры стажировок
+      position: positionSearch.value,
+      department: departmentSearch.value,
+    };
+  }
+});
 
 const sendFilters = () => {
-  console.log(filters.value.candidateSkills)
-  internshipStore.getFilters(filters.value);
-  internshipStore.getInterns(internshipStore.setFilters, internshipStore.setPagination, internshipStore.setSort)
+  console.log(store)
+  store.getFilters(filters.value);
+  store.getInterns(store.setFilters, store.setPagination, store.setSort)
 }
 </script>
 
@@ -156,46 +172,46 @@ const sendFilters = () => {
         </div>
 
         <!-- Фильтр по опыту работы -->
-<div class="mb-4">
-  <label class="mb-1 block text-sm font-medium">Опыт работы</label>
-  <div class="space-y-2">
-    <label class="flex items-center">
-      <input
-        type="checkbox"
-        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
-      />
-      <span class="ml-2 text-sm">Нет опыта</span>
-    </label>
-    <label class="flex items-center">
-      <input
-        type="checkbox"
-        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
-      />
-      <span class="ml-2 text-sm">До 1 года</span>
-    </label>
-    <label class="flex items-center">
-      <input
-        type="checkbox"
-        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
-      />
-      <span class="ml-2 text-sm">1-3 года</span>
-    </label>
-    <label class="flex items-center">
-      <input
-        type="checkbox"
-        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
-      />
-      <span class="ml-2 text-sm">3-5 лет</span>
-    </label>
-    <label class="flex items-center">
-      <input
-        type="checkbox"
-        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
-      />
-      <span class="ml-2 text-sm">Более 5 лет</span>
-    </label>
-  </div>
-</div>
+        <div class="mb-4">
+          <label class="mb-1 block text-sm font-medium">Опыт работы</label>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span class="ml-2 text-sm">Нет опыта</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span class="ml-2 text-sm">До 1 года</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span class="ml-2 text-sm">1-3 года</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span class="ml-2 text-sm">3-5 лет</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span class="ml-2 text-sm">Более 5 лет</span>
+            </label>
+          </div>
+        </div>
 
         <!-- Фильтр по типу занятости -->
         <div class="mb-4">
@@ -263,19 +279,29 @@ const sendFilters = () => {
         class="fixed left-4 top-10 z-20 w-80 rounded-lg bg-white p-4 shadow-xl ring-1 ring-purple-200"
         style="max-height: 90vh; overflow-y: auto;" 
       >
-        <!-- Common filters -->
         <div class="mb-4">
-          <label class="mb-1 block text-sm font-medium">Поиск</label>
-          <input
-            v-model="searchInput"
-            type="text"
-            :placeholder="storeType === 'intern' ? 'По имени' : 'По должности'"
-            class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
-          />
-        </div>
+        <label class="mb-1 block text-sm font-medium">Поиск по должности</label>
+        <input
+          v-model="positionSearch"
+          type="text"
+          placeholder="Введите должность"
+          class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label class="mb-1 block text-sm font-medium">Поиск по отделу</label>
+        <input
+          v-model="departmentSearch"
+          type="text"
+          placeholder="Введите отдел"
+          class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+        />
+      </div>
+        
 
         <!-- Intern specific filters -->
-        <template v-if="storeType === 'intern'">
+        <template v-if="props.store === 'intern'">
           <div class="mb-4">
             <label class="mb-1 block text-sm font-medium">Email</label>
             <input
@@ -302,14 +328,14 @@ const sendFilters = () => {
           <label class="mb-1 block text-sm font-medium">Часов в неделю</label>
           <div class="flex items-center gap-2">
             <input
-              v-model="hoursFrom"
+              
               type="number"
               placeholder="От"
               class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
             />
             <span>-</span>
             <input
-              v-model="hoursTo"
+              
               type="number"
               placeholder="До"
               class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -318,10 +344,10 @@ const sendFilters = () => {
         </div>
 
         <!-- Position filter -->
-        <div class="mb-4" v-if="storeType === 'internship'">
+        <div class="mb-4" v-if="props.store === 'internship'">
           <label class="mb-1 block text-sm font-medium">Отдел</label>
           <select
-            v-model="departmentFilter"
+            
             class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           >
             <option value="">Все отделы</option>
@@ -347,12 +373,12 @@ const sendFilters = () => {
         </div>
 
         <!-- Experience filter (only for interns) -->
-        <div class="mb-4" v-if="storeType === 'intern'">
+        <div class="mb-4" v-if="props.store === 'intern'">
           <label class="mb-1 block text-sm font-medium">Опыт работы</label>
           <div class="space-y-2">
             <label class="flex items-center">
               <input
-                v-model="experienceFilters"
+                
                 value="0"
                 type="checkbox"
                 class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
@@ -361,7 +387,7 @@ const sendFilters = () => {
             </label>
             <label class="flex items-center">
               <input
-                v-model="experienceFilters"
+               
                 value="1"
                 type="checkbox"
                 class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
@@ -370,7 +396,7 @@ const sendFilters = () => {
             </label>
             <label class="flex items-center">
               <input
-                v-model="experienceFilters"
+                
                 value="3"
                 type="checkbox"
                 class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
@@ -381,56 +407,38 @@ const sendFilters = () => {
         </div>
 
         <!-- Status filter (only for internships) -->
-        <div class="mb-4" v-if="storeType === 'internship'">
-          <label class="mb-1 block text-sm font-medium">Статус</label>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input
-                v-model="statusFilters"
-                value="новое"
-                type="checkbox"
-                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
-              />
-              <span class="ml-2 text-sm">Новое</span>
-            </label>
-            <label class="flex items-center">
-              <input
-                v-model="statusFilters"
-                value="в рассмотрении"
-                type="checkbox"
-                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
-              />
-              <span class="ml-2 text-sm">В рассмотрении</span>
-            </label>
-            <label class="flex items-center">
-              <input
-                v-model="statusFilters"
-                value="приглашение"
-                type="checkbox"
-                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
-              />
-              <span class="ml-2 text-sm">Приглашение</span>
-            </label>
-            <label class="flex items-center">
-              <input
-                v-model="statusFilters"
-                value="просмотрено"
-                type="checkbox"
-                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
-              />
-              <span class="ml-2 text-sm">Просмотрено</span>
-            </label>
-            <label class="flex items-center">
-              <input
-                v-model="statusFilters"
-                value="отклонено"
-                type="checkbox"
-                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
-              />
-              <span class="ml-2 text-sm">Отклонено</span>
-            </label>
-          </div>
-        </div>
+<div class="mb-4" v-if="props.store === 'internship'">
+  <label class="mb-1 block text-sm font-medium">Статус</label>
+  <div class="space-y-2">
+    <label class="flex items-center">
+      <input
+        
+        value="просмотрено"
+        type="checkbox"
+        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+      />
+      <span class="ml-2 text-sm">Просмотрено</span>
+    </label>
+    <label class="flex items-center">
+      <input
+        
+        value="отложено"
+        type="checkbox"
+        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+      />
+      <span class="ml-2 text-sm">Отложено</span>
+    </label>
+    <label class="flex items-center">
+      <input
+        
+        value="заблокировано"
+        type="checkbox"
+        class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+      />
+      <span class="ml-2 text-sm">Заблокировано</span>
+    </label>
+  </div>
+</div>
 
         <!-- Employment type filter -->
         <div class="mb-4">
@@ -469,14 +477,14 @@ const sendFilters = () => {
         <!-- Action buttons -->
         <div class="flex justify-end gap-2 sticky bottom-0 bg-white pt-2">
           <button
-            @click="resetFilters"
+            
             class="rounded-md bg-purple-100 px-4 py-2 text-sm font-medium hover:bg-purple-200"
           >
             Сбросить
           </button>
           <button
             class="rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
-            @click="applyFilters"
+            @click="sendFilters"
           >
             Применить
           </button>

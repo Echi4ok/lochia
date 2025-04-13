@@ -239,7 +239,7 @@ const saveEdit = () => {
                 <select v-model="item.body.status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                   <option value="заблокировано">Заблокировано</option>
                   <option value="просмотрено">Просмотрено</option>
-                  <option value="отложенно">Отложенно</option>
+                  <option value="отложено">Отложено</option>
                 </select>
               </div>
             </template>

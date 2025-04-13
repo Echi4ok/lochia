@@ -198,16 +198,12 @@ const sortedBy = (param: string, order: string) => {
         </template>
         <template v-else>
           <span :class="{
-            'bg-blue-100 text-blue-800': item.body.status === 'новое',
-            'bg-yellow-100 text-yellow-800': item.body.status === 'в рассмотрении',
-            'bg-green-100 text-green-800': item.body.status === 'приглашение',
             'bg-gray-100 text-gray-800': item.body.status === 'просмотрено',
-            'bg-red-100 text-red-800': item.body.status === 'отклонено',
-            'bg-orange-100 text-orange-800': item.body.status === 'отложенно',
-            'bg-black-100 text-black-800': item.body.status === 'заблокировано'
+            'bg-orange-100 text-orange-800': item.body.status === 'отложено',
+            'bg-red-100 text-red-800': item.body.status === 'заблокировано'
           }" class="px-2 py-1 rounded-full text-xs font-medium">
             {{ item.body.status }}
-          </span>
+        </span>
         </template>
       </td>
       

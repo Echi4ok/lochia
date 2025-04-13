@@ -8,10 +8,10 @@ const internshipsStore = useInternshipsStore();
 const headers = ref([
   { title: 'Позиция', key: 'position', width: 'w-[15%]', sortable: true },
   { title: 'Отдел', key: 'department', width: 'w-[12%]', sortable: true },
-  { title: 'Образование', key: 'skills', width: 'w-[15%]', sortable: true },
-  { title: 'Навыки', key: 'education', width: 'w-[12%]', sortable: false },
+  { title: 'Образование', key: 'skills', width: 'w-[15%]', sortable: false },
+  { title: 'Навыки', key: 'education', width: 'w-[12%]', sortable: true },
   { title: 'Часы/нед', key: 'hoursPerWeek', width: 'w-[8%]', sortable: true },
-  { title: 'Тип занятости', key: 'employmentType', width: 'w-[10%]', sortable: false },
+  { title: 'Тип занятости', key: 'employmentType', width: 'w-[10%]', sortable: true },
   { title: 'Описание', key: 'description', width: 'w-[18%]', sortable: false },
   { title: 'Статус', key: 'status', width: 'w-[12%]', sortable: true }
 ])
