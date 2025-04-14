@@ -97,17 +97,6 @@ export const useInternshipsStore = defineStore('internships', () => {
     })
   }
 
-//   function getFilteredInterns (filters: Object) {
-//     axios.get(`http://do.gberdyshev.tech:8080/api/v1/candidates`, {params: filters})
-//     .then((res) => {
-//       console.log(res.data.data)
-//       internsArr.value = res.data.data;
-      
-//     }).catch((e) => {
-//       console.error(e.message);
-//       throw e;
-//     })
-//   }
 
 
     onMounted(getInterns);

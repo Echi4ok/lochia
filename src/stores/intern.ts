@@ -97,17 +97,26 @@ export const useInternStore = defineStore('interns', () => {
     })
   }
 
-  function getFilteredInterns (filters: Object) {
-    axios.get(`http://do.gberdyshev.tech:8080/api/v1/candidates`, {params: filters})
+  function exportInterns () {
+    axios.get(`http://do.gberdyshev.tech:8080/api/v1/candidates/external`)
     .then((res) => {
-      console.log(res.data.data)
-      internsArr.value = res.data.data;
-      
+      console.log(res)
     }).catch((e) => {
       console.error(e.message);
       throw e;
     })
+    // window.open('http://do.gberdyshev.tech:8080/api/v1/candidates/external', '_blank');
   }
+
+  // function importInterns () {
+  //   axios.post(`http://do.gberdyshev.tech:8080/api/v1/candidates/external`)
+  //   .then((res) => {
+  //     console.log(res)
+  //   }).catch((e) => {
+  //     console.error(e.message);
+  //     throw e;
+  //   })
+  // }
 
 
     onMounted(getInterns);
@@ -118,10 +127,11 @@ export const useInternStore = defineStore('interns', () => {
     setSort,
     deleteInterns, 
     patchIntern, 
-    postIntern, 
-    getFilteredInterns, 
+    postIntern,  
     getFilters, 
     getPagination, 
     getSort,
+    exportInterns,
+    // importInterns,
   }
 })

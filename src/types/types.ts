@@ -1,7 +1,7 @@
 export interface InternBody {
   education: string;
   email: string;
-  employmentType: 'в офисе' | 'удалённо' | 'гибрид';
+  employmentType: string;
   experience: string;
   hoursPerWeek: number;
   links?: string;
@@ -26,11 +26,11 @@ export interface InternshipBody {
   skills: string;
   education: string;
   hoursPerWeek: number;
-  employmentType: 'в офисе' | 'удалённо' | 'гибрид';
+  employmentType: string;
   description: string;
   position: string;
   department: string;
-  status: 'просмотрено' | 'ждет ответа' | 'отклонено';
+  status: string;
 }
 
 

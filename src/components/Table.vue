@@ -5,7 +5,7 @@ import Filters from './Filters.vue'
 import type { Intern, Internship } from '../types/types'
 import { useInternStore } from '@/stores/intern'
 import { useInternshipsStore } from '@/stores/internships'
-
+import Import from './Import.vue'
 // Определяем нужное хранилище на основе props.storeType
 
 
@@ -74,8 +74,9 @@ const sortedBy = (param: string, order: string) => {
 <template>
   <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
     <div class="flex items-center justify-between mb-4 gap-4">
+      <Import/>
       <Filters class="flex-grow" :store="props.storeType"/>
-      
+
       <!-- Пагинация -->
       <div class="flex gap-1">
         <button 

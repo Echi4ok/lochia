@@ -2,7 +2,7 @@
 import { computed, ref, reactive } from 'vue'
 import { useInternStore } from '@/stores/intern'
 import { useInternshipsStore } from '@/stores/internships'
-import type { Intern, Internship } from '../types/types'
+import type { Intern, Internship, InternBody, InternshipBody } from '../types/types'
 
 const props = defineProps<{
   itemId: string | undefined,

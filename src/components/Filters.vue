@@ -18,7 +18,7 @@ const toggleFilters = () => {
 }
 // фильтры стажеров
 const employmentTypes = ref<Array<string>>([]);
-const skillsInput = ref<string>('');
+const skillsInput = ref<Array<string>>([]);
 const nameInput = ref<string>('');
 const emailInput = ref<string>('');
 const telInput = ref<string>('');
@@ -33,7 +33,7 @@ const filters = computed(() => {
     return {
       // фильтры стажеров
       candidateEmploymentType: employmentTypes.value.join(','),
-      candidateSkills: skillsInput.value,
+      candidateSkills: skillsInput.value.join(','),
       candidateName: nameInput.value,
       candidateEmail: emailInput.value,
       candidatePhone: telInput.value,
@@ -48,9 +48,23 @@ const filters = computed(() => {
 });
 
 const sendFilters = () => {
-  console.log(store)
+  console.log(filters.value)
   store.getFilters(filters.value);
   store.getInterns(store.setFilters, store.setPagination, store.setSort)
+}
+
+const removeFilters = () => {
+  if(props.store == 'intern') {
+    employmentTypes.value = []
+    skillsInput.value = []
+    nameInput.value = ''
+    emailInput.value = ''
+    telInput.value = ''
+  } else {
+    positionSearch.value = ''
+    departmentSearch.value = ''
+  }
+  sendFilters();
 }
 </script>
 
@@ -250,6 +264,7 @@ const sendFilters = () => {
         <!-- Кнопки действий -->
         <div class="flex justify-end gap-2 sticky bottom-0 bg-white pt-2">
           <button
+          @click="removeFilters"
             class="rounded-md bg-purple-100 px-4 py-2 text-sm font-medium hover:bg-purple-200"
           >
             Сбросить
@@ -477,7 +492,7 @@ const sendFilters = () => {
         <!-- Action buttons -->
         <div class="flex justify-end gap-2 sticky bottom-0 bg-white pt-2">
           <button
-            
+            @click="removeFilters"
             class="rounded-md bg-purple-100 px-4 py-2 text-sm font-medium hover:bg-purple-200"
           >
             Сбросить
