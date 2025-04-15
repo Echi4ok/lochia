@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { handleError, onMounted, reactive, ref, watch, computed } from 'vue'
+import { reactive, ref, watch, computed } from 'vue'
 import ModalWindow from './ModalWindow.vue'
 import Filters from './Filters.vue'
 import type { Intern, Internship } from '../types/types'
@@ -25,8 +25,8 @@ let activeSortField = ref(false)
 const displayedItems = ref<any>([])
 
 displayedItems.value = props.items
-let countPage = ref<number>()
-let currentPage = ref(1)
+let countPage = ref<number>() // счетчик страниц
+let currentPage = ref(1) // текущая страница
 
 watch(() => props.items, () => {
   displayedItems.value = props.items

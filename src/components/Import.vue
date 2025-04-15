@@ -16,12 +16,13 @@ const internStore = useInternStore();
     </button>
 
     <!-- Кнопка импорта (скрытый input) -->
-    <label  class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-blue-800 bg-blue-100 border border-blue-300 transition-all duration-200 hover:bg-blue-200 hover:shadow-md">
+    <label class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-blue-800 bg-blue-100 border border-blue-300 transition-all duration-200 hover:bg-blue-200 hover:shadow-md">
       <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
       </svg>
       Импорт CSV
-      <input 
+      <input
+        @change="internStore.importInterns" 
         type="file" 
         accept=".csv" 
         hidden
