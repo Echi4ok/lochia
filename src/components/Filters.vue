@@ -22,27 +22,41 @@ const skillsInput = ref<Array<string>>([]);
 const nameInput = ref<string>('');
 const emailInput = ref<string>('');
 const telInput = ref<string>('');
+const candidateHoursMin = ref<number>();
+const candidateHoursMax = ref<number>();
+const candidatePosition = ref<string>();
 // фильтры стажировок
 const positionSearch = ref<string>('');
 const departmentSearch = ref<string>('');
-
-
+const hoursMin = ref<number>();
+const hoursMax = ref<number>();
+const skills = ref<Array<string>>([]);
+const status = ref<Array<string>>([]);
+const employmentType = ref<Array<string>>([]);
 
 const filters = computed(() => {
   if (props.store === 'intern') {
     return {
       // фильтры стажеров
       candidateEmploymentType: employmentTypes.value.join(','),
-      candidateSkills: skillsInput.value.join(','),
+      candidateSkills: skillsInput.value,
       candidateName: nameInput.value,
       candidateEmail: emailInput.value,
       candidatePhone: telInput.value,
+      candidateHoursMin: candidateHoursMin.value,
+      candidateHoursMax: candidateHoursMax.value,
+      candidatePosition: candidatePosition.value,
     };
   } else {
     return {
       // фильтры стажировок
       position: positionSearch.value,
       department: departmentSearch.value,
+      hoursMin: hoursMin.value,
+      hoursMax: hoursMax.value,
+      skills: skills.value,
+      status: status.value.join(','),
+      employmentType: employmentType.value.join(',')
     };
   }
 });
@@ -55,14 +69,22 @@ const sendFilters = () => {
 
 const removeFilters = () => {
   if(props.store == 'intern') {
-    employmentTypes.value = []
-    skillsInput.value = []
-    nameInput.value = ''
-    emailInput.value = ''
-    telInput.value = ''
+    employmentTypes.value = [];
+    skillsInput.value = [];
+    nameInput.value = '';
+    emailInput.value = '';
+    telInput.value = '';
+    candidateHoursMin.value = 20;
+    candidateHoursMax.value = 40;
+    candidatePosition.value = '';
   } else {
-    positionSearch.value = ''
-    departmentSearch.value = ''
+    positionSearch.value = '';
+    departmentSearch.value = '';
+    hoursMin.value = 20;
+    hoursMax.value = 40;
+    skills.value = [];
+    status.value = [];
+    employmentType.value = [];
   }
   sendFilters();
 }
@@ -142,12 +164,14 @@ const removeFilters = () => {
           <label class="mb-1 block text-sm font-medium">Часов в неделю</label>
           <div class="flex items-center gap-2">
             <input
+              v-model="candidateHoursMin"
               type="number"
               placeholder="От"
               class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
             />
             <span>-</span>
             <input
+              v-model="candidateHoursMax"
               type="number"
               placeholder="До"
               class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -158,19 +182,12 @@ const removeFilters = () => {
         <!-- Фильтр по должности -->
         <div class="mb-4">
           <label class="mb-1 block text-sm font-medium">Должность</label>
-          <select
-            class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
-          >
-            <option value="">Все должности</option>
-            <option>Frontend Developer</option>
-            <option>Backend Developer</option>
-            <option>Fullstack Developer</option>
-            <option>DevOps Engineer</option>
-            <option>QA Engineer</option>
-            <option>UI/UX Designer</option>
-            <option>Project Manager</option>
-            <option>Team Lead</option>
-          </select>
+          <input
+              v-model="candidatePosition"
+              type="text"
+              placeholder="Введите название должности"
+              class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+            />
         </div>
 
         <!-- Фильтр по навыкам -->
@@ -185,7 +202,7 @@ const removeFilters = () => {
           <p class="mt-1 text-xs ">Например: JavaScript, Python, Git</p>
         </div>
 
-        <!-- Фильтр по опыту работы -->
+        <!-- Фильтр по опыту работы
         <div class="mb-4">
           <label class="mb-1 block text-sm font-medium">Опыт работы</label>
           <div class="space-y-2">
@@ -225,7 +242,7 @@ const removeFilters = () => {
               <span class="ml-2 text-sm">Более 5 лет</span>
             </label>
           </div>
-        </div>
+        </div> -->
 
         <!-- Фильтр по типу занятости -->
         <div class="mb-4">
@@ -234,7 +251,7 @@ const removeFilters = () => {
             <label class="flex items-center">
               <input
                 v-model="employmentTypes"
-                value="офис"
+                value="в офисе"
                 type="checkbox"
                 class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
               />
@@ -343,14 +360,14 @@ const removeFilters = () => {
           <label class="mb-1 block text-sm font-medium">Часов в неделю</label>
           <div class="flex items-center gap-2">
             <input
-              
+              v-model="hoursMin"
               type="number"
               placeholder="От"
               class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
             />
             <span>-</span>
             <input
-              
+              v-model="hoursMax"
               type="number"
               placeholder="До"
               class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -358,7 +375,7 @@ const removeFilters = () => {
           </div>
         </div>
 
-        <!-- Position filter -->
+        <!-- Position filter
         <div class="mb-4" v-if="props.store === 'internship'">
           <label class="mb-1 block text-sm font-medium">Отдел</label>
           <select
@@ -373,13 +390,13 @@ const removeFilters = () => {
             <option>Sales</option>
             <option>HR</option>
           </select>
-        </div>
+        </div> -->
 
         <!-- Skills filter -->
         <div class="mb-4">
           <label class="mb-1 block text-sm font-medium">Навыки</label>
           <input
-            v-model="skillsInput"
+            v-model="skills"
             type="text"
             placeholder="Введите навыки через запятую"
             class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -387,7 +404,7 @@ const removeFilters = () => {
           <p class="mt-1 text-xs">Например: JavaScript, Python, Git</p>
         </div>
 
-        <!-- Experience filter (only for interns) -->
+        <!-- Experience filter (only for interns)
         <div class="mb-4" v-if="props.store === 'intern'">
           <label class="mb-1 block text-sm font-medium">Опыт работы</label>
           <div class="space-y-2">
@@ -419,7 +436,7 @@ const removeFilters = () => {
               <span class="ml-2 text-sm">1-3 года</span>
             </label>
           </div>
-        </div>
+        </div> -->
 
         <!-- Status filter (only for internships) -->
 <div class="mb-4" v-if="props.store === 'internship'">
@@ -427,7 +444,7 @@ const removeFilters = () => {
   <div class="space-y-2">
     <label class="flex items-center">
       <input
-        
+        v-model="status"
         value="просмотрено"
         type="checkbox"
         class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
@@ -436,7 +453,7 @@ const removeFilters = () => {
     </label>
     <label class="flex items-center">
       <input
-        
+        v-model="status"
         value="отложено"
         type="checkbox"
         class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
@@ -445,7 +462,7 @@ const removeFilters = () => {
     </label>
     <label class="flex items-center">
       <input
-        
+        v-model="status"
         value="заблокировано"
         type="checkbox"
         class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
@@ -461,7 +478,7 @@ const removeFilters = () => {
           <div class="space-y-2">
             <label class="flex items-center">
               <input
-                v-model="employmentTypes"
+                v-model="employmentType"
                 value="в офисе"
                 type="checkbox"
                 class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
@@ -470,7 +487,7 @@ const removeFilters = () => {
             </label>
             <label class="flex items-center">
               <input
-                v-model="employmentTypes"
+                v-model="employmentType"
                 value="удалённо"
                 type="checkbox"
                 class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
@@ -479,7 +496,7 @@ const removeFilters = () => {
             </label>
             <label class="flex items-center">
               <input
-                v-model="employmentTypes"
+                v-model="employmentType"
                 value="гибрид"
                 type="checkbox"
                 class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"

@@ -29,7 +29,7 @@ const getEmptyItem = () => {
         hoursPerWeek: 20,
         employmentType: "удалённо",
         links: "https://github.com/user",
-        pathToResume: "wedfqwec"
+        pathToResume: "wedеfqwec"
       }
     })
   } else {
@@ -50,15 +50,33 @@ const getEmptyItem = () => {
 
 const item = computed(() => {
   if (props.itemId === undefined) {
-    isEdit.value = true
-    return getEmptyItem()
+    isEdit.value = true;
+    return getEmptyItem();
   }
-  return props.items.find(t => t.id === props.itemId)
-})
+  const foundItem = props.items.find(t => t.id === props.itemId);
+  if (foundItem) {
+    // Инициализируем массив чекбоксов при открытии существующего элемента
+    employmentTypesArr.value = foundItem.body.employmentType.split(',').map(s => s.trim());
+  }
+  return foundItem;
+});
 
 const isEdit = ref(false)
 const copyItemObj = reactive({})
+const employmentTypesArr = ref<string[]>([]);
 
+const employmentTypes = computed({
+  get: () => {
+    return employmentTypesArr.value;
+  },
+  set: (newValue: string[]) => {
+    employmentTypesArr.value = newValue;
+    if (item.value) {
+      item.value.body.employmentType = newValue.join(', ');
+    }
+  }
+});
+console.log(item.value?.body.employmentType.split(','))
 const editMode = () => {
   if (item.value) {
     Object.assign(copyItemObj, JSON.parse(JSON.stringify(item.value)))
@@ -80,7 +98,10 @@ const deleteItem = (id: string) => {
   props.isShowingWindow()
 }
 
+
+
 const saveEdit = () => {
+  // item.value.body.employmentType = employmentTypesArr.value.join(',')
   if (props.itemId == undefined) {
     store.postIntern(item.value.body)
   } else {
@@ -89,6 +110,7 @@ const saveEdit = () => {
   props.isShowingWindow()
   isEdit.value = false
 }
+
 </script>
 
 <template>
@@ -201,11 +223,33 @@ const saveEdit = () => {
             </div>
             <div class="space-y-1">
               <label class="block text-sm font-medium text-gray-700">Тип занятости</label>
-              <select v-model="item.body.employmentType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
-                <option value="в офисе">В офисе</option>
-                <option value="удалённо">Удалённо</option>
-                <option value="гибрид">Гибрид</option>
-              </select>
+              <label class="flex items-center">
+              <input
+                v-model="employmentTypes"
+                value="в офисе"
+                type="checkbox"
+                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span class="ml-2 text-sm ">Офис</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                v-model="employmentTypes"
+                value="удалённо"
+                type="checkbox"
+                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span class="ml-2 text-sm ">Удалённо</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                v-model="employmentTypes"
+                value="гибрид"
+                type="checkbox"
+                class="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span class="ml-2 text-sm ">Гибрид</span>
+            </label>
             </div>
 
             <!-- Поля только для кандидатов -->

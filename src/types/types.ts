@@ -1,7 +1,7 @@
 export interface InternBody {
   education: string;
   email: string;
-  employmentType: string;
+  employmentType: Array<string>;
   experience: string;
   hoursPerWeek: number;
   links?: string;
@@ -26,7 +26,7 @@ export interface InternshipBody {
   skills: string;
   education: string;
   hoursPerWeek: number;
-  employmentType: string;
+  employmentType: Array<string>;
   description: string;
   position: string;
   department: string;

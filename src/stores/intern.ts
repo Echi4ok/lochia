@@ -107,16 +107,39 @@ export const useInternStore = defineStore('interns', () => {
     // })
     window.open('http://do.gberdyshev.tech:8080/api/v1/candidates/external', '_blank');
   }
+  const importInterns = async (event: Event) => {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files?.[0];
+  
+    if (!file) {
+      console.error('Нет файла для загрузки');
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('file', file);
+  
+    try {
+      const response = await axios.post('http://do.gberdyshev.tech:8080/api/v1/candidates/external', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log(response.data);
 
-  function importInterns () {
-    axios.post(`http://do.gberdyshev.tech:8080/api/v1/candidates/external`)
-    .then((res) => {
-      console.log(res)
-    }).catch((e) => {
-      console.error(e.message);
-      throw e;
-    })
-  }
+    } catch (error: any) {
+      if (error.response) {
+        console.error('Ошибка ответа сервера:', error.response.data);
+        console.error('Статус:', error.response.status);
+        console.error('Заголовки:', error.response.headers);
+      } else if (error.request) {
+        console.error('Запрос был отправлен, но не получен ответ:', error.request);
+      } else {
+        console.error('Ошибка при настройке запроса:', error.message);
+      }
+      throw error;
+    }
+  };
 
 
     onMounted(getInterns);

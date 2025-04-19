@@ -9,7 +9,7 @@ const headers = ref([
   { title: 'Имя', key: 'name', width: 'w-[12%]', sortable: true },
   { title: 'Должность', key: 'position', width: 'w-[12%]', sortable: true },
   { title: 'Образование', key: 'education', width: 'w-[10%]', sortable: false },
-  { title: 'Навыки', key: 'skills', width: 'w-[14%]', sortable: true },
+  { title: 'Навыки', key: 'candidateSkills', width: 'w-[14%]', sortable: true },
   { title: 'Опыт', key: 'experience', width: 'w-[8%]', sortable: true },
   { title: 'Часы/нед', key: 'hoursPerWeek', width: 'w-[7%]', sortable: true },
   { title: 'Занятость', key: 'employmentType', width: 'w-[8%]', sortable: false },
