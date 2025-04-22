@@ -107,9 +107,7 @@ export const useInternStore = defineStore('interns', () => {
     // })
     window.open('http://do.gberdyshev.tech:8080/api/v1/candidates/external', '_blank');
   }
-  const importInterns = async (event: Event) => {
-    const fileInput = event.target as HTMLInputElement;
-    const file = fileInput.files?.[0];
+  const importInterns = async (file: any) => {
   
     if (!file) {
       console.error('Нет файла для загрузки');
@@ -126,8 +124,10 @@ export const useInternStore = defineStore('interns', () => {
         },
       });
       console.log(response.data);
+      alert(response.data)
 
     } catch (error: any) {
+      alert(error)
       if (error.response) {
         console.error('Ошибка ответа сервера:', error.response.data);
         console.error('Статус:', error.response.status);

@@ -282,7 +282,7 @@ const removeFilters = () => {
         <div class="flex justify-end gap-2 sticky bottom-0 bg-white pt-2">
           <button
           @click="removeFilters"
-            class="rounded-md bg-purple-100 px-4 py-2 text-sm font-medium hover:bg-purple-200"
+            class="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium hover:bg-gray-200"
           >
             Сбросить
           </button>
@@ -510,7 +510,7 @@ const removeFilters = () => {
         <div class="flex justify-end gap-2 sticky bottom-0 bg-white pt-2">
           <button
             @click="removeFilters"
-            class="rounded-md bg-purple-100 px-4 py-2 text-sm font-medium hover:bg-purple-200"
+            class="rounded-md bg-gray-100 px-4 py-2 text-sm font-medium hover:bg-gray-200"
           >
             Сбросить
           </button>

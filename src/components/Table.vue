@@ -73,32 +73,31 @@ const sortedBy = (param: string, order: string) => {
 <template>
   <div class="candidates-container mx-auto p-4 max-w-screen-2xl">
     <div class="flex items-center justify-between mb-4 gap-4">
-      <Import/>
+      <Import v-if="props.storeType == 'intern'"/>
       <Filters class="flex-grow" :store="props.storeType"/>
-
-<!-- Пагинация с горизонтальным скроллом -->
-<div class="mt-4 max-w-xs mx-auto relative bg-gray-50 rounded-lg p-1 shadow-[0_1px_3px_1px_rgba(0,0,0,0.3)]"> <!-- Темная тень сверху -->
-  <div class="overflow-x-auto whitespace-nowrap py-2 scrollbar">
-    <div class="inline-flex gap-1 px-4">
-      <button 
-        v-for="btn in countPage" 
-        :key="btn"
-        @click="handleClick(btn)"
-        class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full border transition-colors duration-200"
-        :class="{
-          'bg-purple-600 text-white border-purple-600 shadow-inner': currentPage === btn + 1,
-          'bg-white border-gray-300 hover:bg-gray-100': currentPage !== btn + 1
-        }"
-      >
-        {{ btn }}
-      </button>
-    </div>
-  </div>
+      <!-- Пагинация с горизонтальным скроллом -->
+      <div class="mt-4 max-w-xs mx-auto relative bg-gray-50 rounded-lg p-1 shadow-[0_1px_3px_1px_rgba(0,0,0,0.3)]"> <!-- Темная тень сверху -->
+        <div class="overflow-x-auto whitespace-nowrap py-2 scrollbar">
+          <div class="inline-flex gap-1 px-4">
+            <button 
+              v-for="btn in countPage" 
+              :key="btn"
+              @click="handleClick(btn)"
+              class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full border transition-colors duration-200"
+              :class="{
+                'bg-purple-600 text-white border-purple-600 shadow-inner': currentPage === btn + 1,
+                'bg-white border-gray-300 hover:bg-gray-100': currentPage !== btn + 1
+              }"
+            >
+              {{ btn }}
+            </button>
+          </div>
+        </div>
   
-  <!-- Градиенты-индикаторы по краям -->
-  <div class="absolute inset-y-0 left-0 w-8  from-gray-50 to-transparent pointer-events-none rounded-l-lg"></div>
-  <div class="absolute inset-y-0 right-0 w-8  from-gray-50 to-transparent pointer-events-none rounded-r-lg"></div>
-</div>
+        <!-- Градиенты-индикаторы по краям -->
+        <div class="absolute inset-y-0 left-0 w-8  from-gray-50 to-transparent pointer-events-none rounded-l-lg"></div>
+        <div class="absolute inset-y-0 right-0 w-8  from-gray-50 to-transparent pointer-events-none rounded-r-lg"></div>
+      </div>
 
       <button
         @click="creatingItem()"
