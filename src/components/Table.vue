@@ -60,14 +60,20 @@ const creatingItem = () => {
 
 handleClick(1)
 // сортировка
-const sortedBy = (param: string, order: string) => {
+const currentSortColumn = ref<string | null>(null);
+const currentSortOrder = ref<'asc' | 'dsc' | null>(null);
+
+const sortedBy = (param: string, order: 'asc' | 'dsc') => {
+  currentSortColumn.value = param;
+  currentSortOrder.value = order;
+  
   const sortedObj = reactive({
     sortBy: param,
     sortOrder: order,
-  })
-  store.value.getSort(sortedObj)
-  store.value.getInterns(store.value.setFilters, store.value.setPagination, store.value.setSort)
-}
+  });
+  store.value.getSort(sortedObj);
+  store.value.getInterns(store.value.setFilters, store.value.setPagination, store.value.setSort);
+};
 </script>
 
 <template>
@@ -138,10 +144,18 @@ const sortedBy = (param: string, order: string) => {
           >
             <span 
               class="text-xl transition-colors cursor-pointer"
+              :class="{
+                'text-purple-600': currentSortColumn === header.key && currentSortOrder === 'asc',
+                'opacity-100': currentSortColumn === header.key && currentSortOrder !== 'asc'
+              }"
               @click="sortedBy(header.key, 'asc')"
             >↑</span>
             <span 
               class="text-xl transition-colors cursor-pointer"
+              :class="{
+                'text-purple-600': currentSortColumn === header.key && currentSortOrder === 'dsc',
+                'opacity-100': currentSortColumn === header.key && currentSortOrder !== 'dsc'
+              }"
               @click="sortedBy(header.key, 'dsc')"
             >↓</span>
           </div>

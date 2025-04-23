@@ -1,7 +1,9 @@
 import { ref, computed, onMounted, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { alert } from '@/plugins/alert'
 import type { Intern } from '../types/types';
+
 export interface InternBody {
   education: string;
   email: string;
@@ -17,34 +19,30 @@ export interface InternBody {
 }
 
 export const useInternStore = defineStore('interns', () => {
-  let internsArr = ref<Intern[]>([]); // массив данных
-
-  let setFilters = reactive({}); // фильтры по дефолту будет передаваться этот обьект 
-
+  let internsArr = ref<Intern[]>([]);
+  let setFilters = reactive({});
   let setPagination = reactive({
     limit: 10,
     offset: 0,
-  }); // пагинация по дефолту будет передаваться этот обьект 
-
+  });
   let setSort = reactive({
     sortBy: '',
     sortOrder: 'asc'
-  }) // сортировка по дефолту будет передаваться этот обьект 
+  });
 
-
-  function getFilters (filters: any) { // получение фильтров
-    Object.assign(setFilters, filters)
+  function getFilters(filters: any) {
+    Object.assign(setFilters, filters);
   }
 
-  function getPagination (pagination: any) { // получение пагинации
-    Object.assign(setPagination, pagination)
+  function getPagination(pagination: any) {
+    Object.assign(setPagination, pagination);
   }
 
-  function getSort (sort: any) { // получение сортировки
-    Object.assign(setSort, sort)
+  function getSort(sort: any) {
+    Object.assign(setSort, sort);
   }
 
-  function getInterns (filters: any, pagination: any, sort: any) {
+  function getInterns(filters: any, pagination: any, sort: any) {
     axios.get('http://do.gberdyshev.tech:8080/api/v1/candidates', {
       params: {
         ...pagination,
@@ -53,97 +51,149 @@ export const useInternStore = defineStore('interns', () => {
       }
     })
     .then((res) => {
-        internsArr.value = res.data.data;
-        Object.assign(setPagination, res.data.pagination)
+      internsArr.value = res.data.data;
+      Object.assign(setPagination, res.data.pagination);
     }).catch((e) => {
-      console.log(e.message)
-    })
+      const errorMessage = e.response?.data?.message || 'Не удалось загрузить данные кандидатов';
+      alert.show(errorMessage, { 
+        type: 'error',
+        title: 'Ошибка загрузки',
+        buttonText: 'Понятно'
+      });
+      console.error('Ошибка при загрузке данных:', e.message);
+    });
   }
 
-  function deleteInterns (id : string) {
+  function deleteInterns(id: string) {
     axios.delete(`http://do.gberdyshev.tech:8080/api/v1/candidates/${id}`)
     .then((res) => {
-      internsArr.value = internsArr.value.filter((intern) => intern.id !== id)
-      alert('Успешно удалено')
+      internsArr.value = internsArr.value.filter((intern) => intern.id !== id);
+      alert.show('Кандидат успешно удален', { 
+        type: 'success',
+        title: 'Успешно',
+        buttonText: 'Отлично'
+      });
     }).catch((e) => {
-      console.error(e.message);
+      const errorMessage = e.response?.data?.message || 'Не удалось удалить кандидата';
+      alert.show(errorMessage, { 
+        type: 'error',
+        title: 'Ошибка удаления',
+        buttonText: 'Закрыть'
+      });
+      console.error('Ошибка при удалении:', e.message);
       throw e;
-    })
+    });
   }
-  
 
-  function patchIntern (id: string, updatedItem: InternBody) {
-    console.log(id, updatedItem)
+  function patchIntern(id: string, updatedItem: InternBody) {
     axios.put(`http://do.gberdyshev.tech:8080/api/v1/candidates/${id}`, updatedItem)
     .then((res) => {
-      console.log(res.data)
-      alert('Данные успешно обновлены');
+      alert.show('Данные кандидата успешно обновлены', { 
+        type: 'success',
+        title: 'Успешно',
+        buttonText: 'OK'
+      });
+      console.log('Данные обновлены:', res.data);
     }).catch((e) => {
-      console.error(e.message);
+      const errorMessage = e.response?.data?.message || 'Не удалось обновить данные кандидата';
+      alert.show(errorMessage, { 
+        type: 'error',
+        title: 'Ошибка обновления',
+        buttonText: 'Понятно'
+      });
+      console.error('Ошибка при обновлении:', e.message);
       throw e;
-    })
+    });
   }
 
-  function postIntern (createdItem: InternBody) {
-    console.log(createdItem)
+  function postIntern(createdItem: InternBody) {
     axios.post(`http://do.gberdyshev.tech:8080/api/v1/candidates`, createdItem)
     .then((res) => {
-      internsArr.value.push(res.data[0])
-      console.log(internsArr.value)
-      alert('Успешно создан кандидат');
+      internsArr.value.push(res.data[0]);
+      alert.show('Новый кандидат успешно создан', { 
+        type: 'success',
+        title: 'Успешно',
+        buttonText: 'Отлично'
+      });
+      console.log('Добавлен кандидат:', res.data[0]);
     }).catch((e) => {
-      console.error(e.message);
+      const errorMessage = e.response?.data?.message || 'Не удалось создать кандидата';
+      alert.show(errorMessage, { 
+        type: 'error',
+        title: 'Ошибка создания',
+        buttonText: 'Закрыть'
+      });
+      console.error('Ошибка при создании:', e.message);
       throw e;
-    })
+    });
   }
 
-  function exportInterns () {
-    // axios.get(`http://do.gberdyshev.tech:8080/api/v1/candidates/external`)
-    // .then((res) => {
-    //   console.log(res)
-    // }).catch((e) => {
-    //   console.error(e.message);
-    //   throw e;
-    // })
-    window.open('http://do.gberdyshev.tech:8080/api/v1/candidates/external', '_blank');
+  function exportInterns() {
+    try {
+      window.open('http://do.gberdyshev.tech:8080/api/v1/candidates/external', '_blank');
+    } catch (e) {
+      alert.show('Не удалось экспортировать данные', { 
+        type: 'error',
+        title: 'Ошибка экспорта',
+        buttonText: 'Понятно'
+      });
+      console.error('Ошибка при экспорте:', e);
+    }
   }
+
   const importInterns = async (file: any) => {
-  
     if (!file) {
+      alert.show('Пожалуйста, выберите файл для импорта', { 
+        type: 'warning',
+        title: 'Файл не выбран',
+        buttonText: 'Выбрать'
+      });
       console.error('Нет файла для загрузки');
       return;
     }
-  
+
     const formData = new FormData();
     formData.append('file', file);
-  
+
     try {
       const response = await axios.post('http://do.gberdyshev.tech:8080/api/v1/candidates/external', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log(response.data);
-      alert(response.data)
-
+      
+      const successMessage = response.data?.message || 'Данные успешно импортированы';
+      alert.show(successMessage, { 
+        type: 'success',
+        title: 'Успешно',
+        buttonText: 'OK'
+      });
+      console.log('Импорт данных:', response.data);
     } catch (error: any) {
-      alert(error)
+      const errorMessage = error.response?.data?.message || 
+                         'Произошла ошибка при импорте данных';
+      
+      alert.show(errorMessage, { 
+        type: 'error',
+        title: 'Ошибка импорта',
+        buttonText: 'Закрыть'
+      });
+
       if (error.response) {
-        console.error('Ошибка ответа сервера:', error.response.data);
-        console.error('Статус:', error.response.status);
-        console.error('Заголовки:', error.response.headers);
+        console.error('Ошибка сервера:', error.response.data);
       } else if (error.request) {
-        console.error('Запрос был отправлен, но не получен ответ:', error.request);
+        console.error('Нет ответа от сервера:', error.request);
       } else {
-        console.error('Ошибка при настройке запроса:', error.message);
+        console.error('Ошибка запроса:', error.message);
       }
       throw error;
     }
   };
 
-
-    onMounted(getInterns);
-  return { getInterns, 
+  onMounted(getInterns);
+  
+  return { 
+    getInterns, 
     internsArr, 
     setFilters,
     setPagination,
@@ -157,4 +207,4 @@ export const useInternStore = defineStore('interns', () => {
     exportInterns,
     importInterns,
   }
-})
+});

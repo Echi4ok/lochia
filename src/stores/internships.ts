@@ -1,7 +1,9 @@
 import { ref, computed, onMounted, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { alert } from '@/plugins/alert'
 import type { Intern } from '../types/types';
+
 export interface InternBody {
   education: string;
   email: string;
@@ -17,34 +19,30 @@ export interface InternBody {
 }
 
 export const useInternshipsStore = defineStore('internships', () => {
-  let internshipsArr = ref<any>([]); // массив данных
-
-  let setFilters = reactive({}); // фильтры по дефолту будет передаваться этот обьект 
-
+  let internshipsArr = ref<Intern[]>([]);
+  let setFilters = reactive({});
   let setPagination = reactive({
     limit: 10,
     offset: 0,
-  }); // пагинация по дефолту будет передаваться этот обьект 
-
+  });
   let setSort = reactive({
     sortBy: '',
     sortOrder: 'asc'
-  }) // сортировка по дефолту будет передаваться этот обьект 
+  });
 
-
-  function getFilters (filters: any) { // получение фильтров
-    Object.assign(setFilters, filters)
+  function getFilters(filters: any) {
+    Object.assign(setFilters, filters);
   }
 
-  function getPagination (pagination: any) { // получение пагинации
-    Object.assign(setPagination, pagination)
+  function getPagination(pagination: any) {
+    Object.assign(setPagination, pagination);
   }
 
-  function getSort (sort: any) { // получение сортировки
-    Object.assign(setSort, sort)
+  function getSort(sort: any) {
+    Object.assign(setSort, sort);
   }
 
-  function getInterns (filters: any, pagination: any, sort: any) {
+  function getInterns(filters: any, pagination: any, sort: any) {
     axios.get('http://do.gberdyshev.tech:8080/api/v1/internships', {
       params: {
         ...pagination,
@@ -53,54 +51,87 @@ export const useInternshipsStore = defineStore('internships', () => {
       }
     })
     .then((res) => {
-        internshipsArr.value = res.data.data;
-        Object.assign(setPagination, res.data.pagination)
+      internshipsArr.value = res.data.data;
+      Object.assign(setPagination, res.data.pagination);
     }).catch((e) => {
-      console.log(e.message)
-    })
+      const errorMessage = e.response?.data?.message || 'Не удалось загрузить стажировки';
+      alert.show(errorMessage, { 
+        type: 'error',
+        title: 'Ошибка загрузки',
+        buttonText: 'Понятно'
+      });
+      console.error('Ошибка при загрузке стажировок:', e.message);
+    });
   }
 
-  function deleteInterns (id : string) {
+  function deleteInterns(id: string) {
     axios.delete(`http://do.gberdyshev.tech:8080/api/v1/internships/${id}`)
     .then((res) => {
-        internshipsArr.value = internshipsArr.value.filter((intern: Intern) => intern.id !== id)
-      alert('Успешно удалено')
+      internshipsArr.value = internshipsArr.value.filter((intern: Intern) => intern.id !== id);
+      alert.show('Стажировка успешно удалена', { 
+        type: 'success',
+        title: 'Успешно',
+        buttonText: 'Отлично'
+      });
     }).catch((e) => {
-      console.error(e.message);
+      const errorMessage = e.response?.data?.message || 'Не удалось удалить стажировку';
+      alert.show(errorMessage, { 
+        type: 'error',
+        title: 'Ошибка удаления',
+        buttonText: 'Закрыть'
+      });
+      console.error('Ошибка при удалении стажировки:', e.message);
       throw e;
-    })
+    });
   }
-  
 
-  function patchIntern (id: string, updatedItem: InternBody) {
-    console.log(id, updatedItem)
+  function patchIntern(id: string, updatedItem: InternBody) {
     axios.put(`http://do.gberdyshev.tech:8080/api/v1/internships/${id}`, updatedItem)
     .then((res) => {
-      console.log(res.data)
-      alert('Данные успешно обновлены');
+      alert.show('Данные стажировки успешно обновлены', { 
+        type: 'success',
+        title: 'Успешно',
+        buttonText: 'OK'
+      });
+      console.log('Данные стажировки обновлены:', res.data);
     }).catch((e) => {
-      console.error(e.message);
+      const errorMessage = e.response?.data?.message || 'Не удалось обновить данные стажировки';
+      alert.show(errorMessage, { 
+        type: 'error',
+        title: 'Ошибка обновления',
+        buttonText: 'Понятно'
+      });
+      console.error('Ошибка при обновлении стажировки:', e.message);
       throw e;
-    })
+    });
   }
 
-  function postIntern (createdItem: InternBody) {
-    console.log(createdItem)
+  function postIntern(createdItem: InternBody) {
     axios.post(`http://do.gberdyshev.tech:8080/api/v1/internships`, createdItem)
     .then((res) => {
-        internshipsArr.value.push(res.data[0])
-      console.log(internshipsArr.value)
-      alert('Успешно создан кандидат');
+      internshipsArr.value.push(res.data[0]);
+      alert.show('Новая стажировка успешно создана', { 
+        type: 'success',
+        title: 'Успешно',
+        buttonText: 'Отлично'
+      });
+      console.log('Добавлена стажировка:', res.data[0]);
     }).catch((e) => {
-      console.error(e.message);
+      const errorMessage = e.response?.data?.message || 'Не удалось создать стажировку';
+      alert.show(errorMessage, { 
+        type: 'error',
+        title: 'Ошибка создания',
+        buttonText: 'Закрыть'
+      });
+      console.error('Ошибка при создании стажировки:', e.message);
       throw e;
-    })
+    });
   }
 
-
-
-    onMounted(getInterns);
-  return { getInterns, 
+  onMounted(getInterns);
+  
+  return { 
+    getInterns, 
     internshipsArr, 
     setFilters,
     setPagination,
@@ -112,4 +143,4 @@ export const useInternshipsStore = defineStore('internships', () => {
     getPagination, 
     getSort,
   }
-})
+});

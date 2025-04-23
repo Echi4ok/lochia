@@ -37,6 +37,27 @@ const sendFile = () => {
     console.log('Ошибка')
   }
 }
+
+const handleFileDrop = (e: DragEvent) => {
+  e.preventDefault();
+  // Проверяем, что файлы есть
+  if (!e.dataTransfer?.files.length) {
+    console.error('Нет файлов в dataTransfer');
+    return;
+  }
+
+  const files = e.dataTransfer.files;
+  console.log('Получены файлы:', files);  // Теперь файлы будут здесь!
+  
+  selectedFile.value = files[0];
+  isFileGet.value = true;
+};
+
+const onDragOver = (e: DragEvent) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';  // Разрешаем копирование файлов
+  isDragging.value = true;  // Подсвечиваем зону
+};
 </script>
 
 <template>
@@ -83,10 +104,11 @@ const sendFile = () => {
           <h3 class="text-lg font-medium text-gray-900 mb-4">Импорт CSV файла</h3>
           
           <div 
-            class="border-2 border-dashed border-gray-300 rounded-lg p-8 h-[400px] text-center mb-4 transition-colors"
-            :class="{'bg-gray-50 border-purple-400': isDragging}"
-            @dragover.prevent="isDragging = true"
-            @dragleave.prevent="isDragging = false"
+            class="border-2 border-dashed border-gray-300 rounded-lg p-8 h-[400px] text-center mb-4 transition-colors drop-zone"
+           
+            @dragover.prevent="onDragOver"
+            @dragleave.prevent
+            @drop.prevent="handleFileDrop"
           >
             <input 
               ref="fileInput"
@@ -137,5 +159,7 @@ const sendFile = () => {
 </template>
 
 <style scoped>
-/* Дополнительные стили могут быть добавлены, если необходимо */
+.drop-zone {
+  pointer-events: all; /* Или 'auto' */
+}
 </style>
