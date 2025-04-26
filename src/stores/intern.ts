@@ -4,6 +4,8 @@ import axios from 'axios'
 import { alert } from '@/plugins/alert'
 import type { Intern } from '../types/types';
 
+const API_BASE_URL = 'http://do.gberdyshev.tech:8080/api/v1'
+
 export interface InternBody {
   education: string;
   email: string;
@@ -43,7 +45,7 @@ export const useInternStore = defineStore('interns', () => {
   }
 
   function getInterns(filters: any, pagination: any, sort: any) {
-    axios.get('http://do.gberdyshev.tech:8080/api/v1/candidates', {
+    axios.get(`${API_BASE_URL}/candidates`, {
       params: {
         ...pagination,
         ...filters,
@@ -65,7 +67,7 @@ export const useInternStore = defineStore('interns', () => {
   }
 
   function deleteInterns(id: string) {
-    axios.delete(`http://do.gberdyshev.tech:8080/api/v1/candidates/${id}`)
+    axios.delete(`${API_BASE_URL}/candidates/${id}`)
     .then((res) => {
       internsArr.value = internsArr.value.filter((intern) => intern.id !== id);
       alert.show('Кандидат успешно удален', { 
@@ -86,7 +88,7 @@ export const useInternStore = defineStore('interns', () => {
   }
 
   function patchIntern(id: string, updatedItem: InternBody) {
-    axios.put(`http://do.gberdyshev.tech:8080/api/v1/candidates/${id}`, updatedItem)
+    axios.put(`${API_BASE_URL}/candidates/${id}`, updatedItem)
     .then((res) => {
       alert.show('Данные кандидата успешно обновлены', { 
         type: 'success',
@@ -107,7 +109,7 @@ export const useInternStore = defineStore('interns', () => {
   }
 
   function postIntern(createdItem: InternBody) {
-    axios.post(`http://do.gberdyshev.tech:8080/api/v1/candidates`, createdItem)
+    axios.post(`${API_BASE_URL}/candidates`, createdItem)
     .then((res) => {
       internsArr.value.push(res.data[0]);
       alert.show('Новый кандидат успешно создан', { 
@@ -130,7 +132,7 @@ export const useInternStore = defineStore('interns', () => {
 
   function exportInterns() {
     try {
-      window.open('http://do.gberdyshev.tech:8080/api/v1/candidates/external', '_blank');
+      window.open(`${API_BASE_URL}/external`, '_blank');
     } catch (e) {
       alert.show('Не удалось экспортировать данные', { 
         type: 'error',
@@ -156,7 +158,7 @@ export const useInternStore = defineStore('interns', () => {
     formData.append('file', file);
 
     try {
-      const response = await axios.post('http://do.gberdyshev.tech:8080/api/v1/candidates/external', formData, {
+      const response = await axios.post(`${API_BASE_URL}/external`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

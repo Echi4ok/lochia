@@ -4,6 +4,8 @@ import axios from 'axios'
 import { alert } from '@/plugins/alert'
 import type { Intern } from '../types/types';
 
+const API_BASE_URL = 'http://do.gberdyshev.tech:8080/api/v1'
+
 export interface InternBody {
   education: string;
   email: string;
@@ -43,7 +45,7 @@ export const useInternshipsStore = defineStore('internships', () => {
   }
 
   function getInterns(filters: any, pagination: any, sort: any) {
-    axios.get('http://do.gberdyshev.tech:8080/api/v1/internships', {
+    axios.get(`${API_BASE_URL}/internships`, {
       params: {
         ...pagination,
         ...filters,
@@ -65,7 +67,7 @@ export const useInternshipsStore = defineStore('internships', () => {
   }
 
   function deleteInterns(id: string) {
-    axios.delete(`http://do.gberdyshev.tech:8080/api/v1/internships/${id}`)
+    axios.delete(`${API_BASE_URL}/internships/${id}`)
     .then((res) => {
       internshipsArr.value = internshipsArr.value.filter((intern: Intern) => intern.id !== id);
       alert.show('Стажировка успешно удалена', { 
@@ -86,7 +88,7 @@ export const useInternshipsStore = defineStore('internships', () => {
   }
 
   function patchIntern(id: string, updatedItem: InternBody) {
-    axios.put(`http://do.gberdyshev.tech:8080/api/v1/internships/${id}`, updatedItem)
+    axios.put(`${API_BASE_URL}/internships/${id}`, updatedItem)
     .then((res) => {
       alert.show('Данные стажировки успешно обновлены', { 
         type: 'success',
@@ -107,7 +109,7 @@ export const useInternshipsStore = defineStore('internships', () => {
   }
 
   function postIntern(createdItem: InternBody) {
-    axios.post(`http://do.gberdyshev.tech:8080/api/v1/internships`, createdItem)
+    axios.post(`${API_BASE_URL}/internships`, createdItem)
     .then((res) => {
       internshipsArr.value.push(res.data[0]);
       alert.show('Новая стажировка успешно создана', { 
