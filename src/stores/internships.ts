@@ -4,7 +4,7 @@ import axios from 'axios'
 import { alert } from '@/plugins/alert'
 import type { Intern } from '../types/types';
 
-const API_BASE_URL = 'http://do.gberdyshev.tech:8080/api/v1'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export interface InternBody {
   education: string;
