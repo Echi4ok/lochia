@@ -132,7 +132,7 @@ export const useInternStore = defineStore('interns', () => {
 
   function exportInterns() {
     try {
-      window.open(`${API_BASE_URL}/external`, '_blank');
+      window.open(`${API_BASE_URL}/candidates/external`, '_blank');
     } catch (e) {
       alert.show('Не удалось экспортировать данные', { 
         type: 'error',
@@ -158,7 +158,7 @@ export const useInternStore = defineStore('interns', () => {
     formData.append('file', file);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/external`, formData, {
+      const response = await axios.post(`${API_BASE_URL}/candidates/external`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

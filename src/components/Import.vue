@@ -55,7 +55,7 @@ const handleFileDrop = (e: DragEvent) => {
 
 const onDragOver = (e: DragEvent) => {
   e.preventDefault();
-  e.dataTransfer.dropEffect = 'copy';  // Разрешаем копирование файлов
+  if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';  // Разрешаем копирование файлов
   isDragging.value = true;  // Подсвечиваем зону
 };
 </script>
