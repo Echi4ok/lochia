@@ -4,6 +4,7 @@ import { useInternStore } from '@/stores/intern';
 import { useInternshipsStore } from '@/stores/internships'
 
 
+
 const props = defineProps<{
   store: string,
 }>()
@@ -12,13 +13,14 @@ const store = props.store === 'intern' ? useInternStore() : useInternshipsStore(
 
 
 const showFilters = ref(false);
+const skillsArray = ref<Array<string>>([]);
 
 const toggleFilters = () => {
   showFilters.value = !showFilters.value
 }
 // фильтры стажеров
 const employmentTypes = ref<Array<string>>([]);
-const skillsInput = ref<Array<string>>([]);
+const skillsInput = ref<string>('');
 const nameInput = ref<string>('');
 const emailInput = ref<string>('');
 const telInput = ref<string>('');
@@ -39,7 +41,7 @@ const filters = computed(() => {
     return {
       // фильтры стажеров
       candidateEmploymentType: employmentTypes.value.join(','),
-      candidateSkills: skillsInput.value,
+      candidateSkills: skillsArray.value.join(', '),
       candidateName: nameInput.value,
       candidateEmail: emailInput.value,
       candidatePhone: telInput.value,
@@ -54,7 +56,7 @@ const filters = computed(() => {
       department: departmentSearch.value,
       hoursMin: hoursMin.value,
       hoursMax: hoursMax.value,
-      skills: skills.value,
+      skills: skillsArray.value.join(', '),
       status: status.value.join(','),
       employmentType: employmentType.value.join(',')
     };
@@ -67,10 +69,14 @@ const sendFilters = () => {
   store.getInterns(store.setFilters, store.setPagination, store.setSort)
 }
 
+let count = ref(0);
+
 const removeFilters = () => {
+  count.value = 0;
   if(props.store == 'intern') {
     employmentTypes.value = [];
-    skillsInput.value = [];
+    skillsInput.value = '';
+    skillsArray.value = [];
     nameInput.value = '';
     emailInput.value = '';
     telInput.value = '';
@@ -88,6 +94,179 @@ const removeFilters = () => {
   }
   sendFilters();
 }
+
+
+let skillsArr = [
+  "postgresql",
+  "minecraft",
+  "csgo",
+  "sql",
+  "javascript",
+  "sql python",
+  "python",
+  "java",
+  "golang",
+  "docker",
+  "git",
+  "react",
+  "go",
+  "kubernetes",
+  "ansible",
+  "linux",
+  "fastapi",
+  "django",
+  "graphql",
+  "flask",
+  "spring",
+  "node.js",
+  "express",
+  "typescript",
+  "html",
+  "css",
+  "sass",
+  "vue",
+  "angular",
+  "redux",
+  "mongodb",
+  "mysql",
+  "redis",
+  "aws",
+  "azure",
+  "gcp",
+  "terraform",
+  "jenkins",
+  "ci/cd",
+  "rest api",
+  "microservices",
+  "rabbitmq",
+  "kafka",
+  "elasticsearch",
+  "postman",
+  "swagger",
+  "nginx",
+  "apache",
+  "pandas",
+  "numpy",
+  "tensorflow",
+  "pytorch",
+  "machine learning",
+  "data science",
+  "big data",
+  "hadoop",
+  "spark",
+  "scala",
+  "rust",
+  "c++",
+  "c#",
+  ".net",
+  "php",
+  "laravel",
+  "ruby",
+  "rails",
+  "bash",
+  "powershell",
+  "solidity",
+  "blockchain",
+  "ethereum",
+  "smart contracts",
+  "figma",
+  "adobe xd",
+  "ui/ux design",
+  "photoshop",
+  "illustrator",
+  "premiere pro",
+  "after effects",
+  "blender",
+  "unity",
+  "unreal engine",
+  "arduino",
+  "raspberry pi",
+  "iot",
+  "cybersecurity",
+  "penetration testing",
+  "ethical hacking",
+  "network security",
+  "devops",
+  "agile",
+  "scrum",
+  "kanban",
+  "project management",
+  "jira",
+  "trello",
+  "slack",
+  "microsoft teams",
+  "zoom",
+  "google workspace",
+  "microsoft office",
+  "excel",
+  "power bi",
+  "tableau",
+  "data analysis",
+  "business intelligence",
+  "digital marketing",
+  "seo",
+  "content writing",
+  "technical writing",
+  "customer support",
+  "sales",
+  "negotiation",
+  "public speaking",
+  "leadership",
+  "team management",
+  "recruiting",
+  "human resources",
+  "accounting",
+  "finance",
+]
+
+let copySkillsArr = [...skillsArr];
+let copyInputSkillsArr = ref([...skillsInput.value])
+
+const searchingSkills = () => {
+  // skillsArr = [...copySkillsArr]
+  if(skillsInput.value) {
+  skillsArr = skillsArr.filter((skill, idx) => {
+  return skillsInput.value.includes(skill.substring(0, count.value)) == true
+  })
+}
+}
+
+watch(() => skillsInput.value, (newVal, oldVal) => {
+  console.log(newVal, oldVal)
+  
+  if(oldVal.length <= newVal.length) {
+    count.value++;
+  } else {
+    skillsArr = [...copySkillsArr]
+    count.value--;
+  }
+  console.log(count.value)
+
+  searchingSkills();
+
+  console.log(skillsArr)
+})
+
+
+const pushSkills = (skill: string) => {
+if(skillsInput.value || skill != '') {
+  skillsArray.value.push(skill);
+  skillsInput.value = '';
+  skillsArr = [...copySkillsArr]
+  count.value = 0;
+}
+  
+
+
+}
+
+const removeSkills = (skill: string) => {
+skillsArray.value = skillsArray.value.filter((el) => {
+return el !== skill;
+})
+}
+
+
 </script>
 
 
@@ -192,14 +371,51 @@ const removeFilters = () => {
 
         <!-- Фильтр по навыкам -->
         <div class="mb-4">
-          <label class="mb-1 block text-sm font-medium ">Навыки</label>
+          <label class="mb-1 block text-sm font-medium">Навыки</label>
+          
+          <!-- Выбранные навыки с крестиками -->
+          <div class="mb-3 flex flex-wrap gap-2">
+            <span 
+              v-for="addSkill in skillsArray"
+              :key="addSkill"
+              class="inline-flex items-center rounded-md border border-purple-200 bg-purple-50 px-3 py-1 text-sm text-purple-800 hover:bg-purple-100"
+            >
+              {{ addSkill }}
+              <button 
+                @click="removeSkills(addSkill)"
+                class="ml-2 text-purple-500 hover:text-purple-700 text-base"
+              >
+                &times;
+              </button>
+            </span>
+          </div>
+
           <input
             v-model="skillsInput"
+            @keyup.enter="pushSkills(skillsInput)"
             type="text"
             placeholder="Введите навыки через запятую"
             class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           />
-          <p class="mt-1 text-xs ">Например: JavaScript, Python, Git</p>
+          <p class="mt-2 text-xs text-gray-500">Например: javascript, python, git</p>
+          
+          <!-- Список навыков -->
+          <div class="mt-3 max-h-[200px] overflow-y-auto">
+            <div class="flex flex-wrap gap-2">
+              <span 
+                @click="pushSkills(skill)"
+                v-for="skill in skillsArr.slice(0, 12)"
+                :key="skill"
+                class="inline-block rounded-md border border-purple-200 bg-purple-50 px-3 py-1 text-sm text-purple-800 hover:bg-purple-100 hover:cursor-pointer"
+              >
+                {{ skill }}
+              </span>
+              <div v-if="skillsArr.length == 0" class="w-full py-2 text-sm text-gray-500">
+                <p>Увы, ничего не найдено, минус вайб</p>
+                <p>Нажмите Enter, чтобы скил появился в инпуте</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Фильтр по опыту работы
@@ -393,15 +609,52 @@ const removeFilters = () => {
         </div> -->
 
         <!-- Skills filter -->
-        <div class="mb-4">
+            <div class="mb-4">
           <label class="mb-1 block text-sm font-medium">Навыки</label>
+          
+          <!-- Выбранные навыки с крестиками -->
+          <div class="mb-3 flex flex-wrap gap-2">
+            <span 
+              v-for="addSkill in skillsArray"
+              :key="addSkill"
+              class="inline-flex items-center rounded-md border border-purple-200 bg-purple-50 px-3 py-1 text-sm text-purple-800 hover:bg-purple-100"
+            >
+              {{ addSkill }}
+              <button 
+                @click="removeSkills(addSkill)"
+                class="ml-2 text-purple-500 hover:text-purple-700 text-base"
+              >
+                &times;
+              </button>
+            </span>
+          </div>
+
           <input
-            v-model="skills"
+            v-model="skillsInput"
+            @keyup.enter="pushSkills(skillsInput)"
             type="text"
             placeholder="Введите навыки через запятую"
             class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
           />
-          <p class="mt-1 text-xs">Например: JavaScript, Python, Git</p>
+          <p class="mt-2 text-xs text-gray-500">Например: javascript, python, git</p>
+          
+          <!-- Список навыков -->
+          <div class="mt-3 max-h-[200px] overflow-y-auto">
+            <div class="flex flex-wrap gap-2">
+              <span 
+                @click="pushSkills(skill)"
+                v-for="skill in skillsArr.slice(0, 12)"
+                :key="skill"
+                class="inline-block rounded-md border border-purple-200 bg-purple-50 px-3 py-1 text-sm text-purple-800 hover:bg-purple-100 hover:cursor-pointer"
+              >
+                {{ skill }}
+              </span>
+              <div v-if="skillsArr.length == 0" class="w-full py-2 text-sm text-gray-500">
+                <p>Увы, ничего не найдено, минус вайб</p>
+                <p>Нажмите Enter, чтобы скил появился в инпуте</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Experience filter (only for interns)
