@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, reactive } from 'vue'
+import { computed, ref, reactive, watch } from 'vue'
 import { useInternStore } from '@/stores/intern'
 import { useInternshipsStore } from '@/stores/internships'
 import type { Intern, Internship, InternBody, InternshipBody } from '../types/types'
@@ -13,7 +13,132 @@ const props = defineProps<{
 
 // Определяем нужное хранилище
 const store = props.storeType === 'intern' ? useInternStore() : useInternshipsStore()
-
+let skillsArr = [
+  "postgresql",
+  "minecraft",
+  "csgo",
+  "sql",
+  "javascript",
+  "sql python",
+  "python",
+  "java",
+  "golang",
+  "docker",
+  "git",
+  "react",
+  "go",
+  "kubernetes",
+  "ansible",
+  "linux",
+  "fastapi",
+  "django",
+  "graphql",
+  "flask",
+  "spring",
+  "node.js",
+  "express",
+  "typescript",
+  "html",
+  "css",
+  "sass",
+  "vue",
+  "angular",
+  "redux",
+  "mongodb",
+  "mysql",
+  "redis",
+  "aws",
+  "azure",
+  "gcp",
+  "terraform",
+  "jenkins",
+  "ci/cd",
+  "rest api",
+  "microservices",
+  "rabbitmq",
+  "kafka",
+  "elasticsearch",
+  "postman",
+  "swagger",
+  "nginx",
+  "apache",
+  "pandas",
+  "numpy",
+  "tensorflow",
+  "pytorch",
+  "machine learning",
+  "data science",
+  "big data",
+  "hadoop",
+  "spark",
+  "scala",
+  "rust",
+  "c++",
+  "c#",
+  ".net",
+  "php",
+  "laravel",
+  "ruby",
+  "rails",
+  "bash",
+  "powershell",
+  "solidity",
+  "blockchain",
+  "ethereum",
+  "smart contracts",
+  "figma",
+  "adobe xd",
+  "ui/ux design",
+  "photoshop",
+  "illustrator",
+  "premiere pro",
+  "after effects",
+  "blender",
+  "unity",
+  "unreal engine",
+  "arduino",
+  "raspberry pi",
+  "iot",
+  "cybersecurity",
+  "penetration testing",
+  "ethical hacking",
+  "network security",
+  "devops",
+  "agile",
+  "scrum",
+  "kanban",
+  "project management",
+  "jira",
+  "trello",
+  "slack",
+  "microsoft teams",
+  "zoom",
+  "google workspace",
+  "microsoft office",
+  "excel",
+  "power bi",
+  "tableau",
+  "data analysis",
+  "business intelligence",
+  "digital marketing",
+  "seo",
+  "content writing",
+  "technical writing",
+  "customer support",
+  "sales",
+  "negotiation",
+  "public speaking",
+  "leadership",
+  "team management",
+  "recruiting",
+  "human resources",
+  "accounting",
+  "finance",
+]
+const skillsArray = ref([])
+let skillsInput = ref('')
+let count = ref(0);
+let copySkillsArr = [...skillsArr]
 // Шаблон нового элемента в зависимости от типа
 const getEmptyItem = () => {
   if (props.storeType === 'intern') {
@@ -55,8 +180,8 @@ const item = computed(() => {
   }
   const foundItem = props.items.find(t => t.id === props.itemId);
   if (foundItem) {
-    // Инициализируем массив чекбоксов при открытии существующего элемента
     employmentTypesArr.value = foundItem.body.employmentType.split(',').map(s => s.trim());
+    skillsArray.value = [...foundItem.body.skills.split(',')]
   }
   return foundItem;
 });
@@ -76,6 +201,8 @@ const employmentTypes = computed({
     }
   }
 });
+
+
 console.log(item.value?.body.employmentType.split(','))
 const editMode = () => {
   if (item.value) {
@@ -102,14 +229,56 @@ const deleteItem = (id: string) => {
 
 const saveEdit = () => {
   // item.value.body.employmentType = employmentTypesArr.value.join(',')
+
   if (props.itemId == undefined) {
     store.postIntern(item.value.body)
   } else {
+    item.value.body.skills = skillsArray.value.join(', ');
     store.patchIntern(props.itemId, item.value.body)
   }
   props.isShowingWindow()
   isEdit.value = false
 }
+
+
+const searchingSkills = () => {
+  if(skillsInput.value) {
+  skillsArr = skillsArr.filter((skill, idx) => {
+  return skillsInput.value.includes(skill.substring(0, count.value)) == true
+  })
+}
+}
+
+const pushSkills = (skill: string) => {
+skillsArray.value.push(skill);
+skillsInput.value = '';
+skillsArr = [...copySkillsArr]
+  count.value = 0;
+}
+
+const removeSkills = (skill: string) => {
+skillsArray.value = skillsArray.value.filter((el) => {
+return el != skill;
+})
+}
+
+watch(() => skillsInput.value, (newVal, oldVal) => {
+  console.log(newVal, oldVal)
+  
+  if(oldVal.length <= newVal.length) {
+    count.value++;
+  } else {
+    skillsArr = [...copySkillsArr]
+    count.value--;
+  }
+  console.log(count.value)
+
+  searchingSkills();
+
+  console.log(skillsArr)
+})
+
+
 
 </script>
 
@@ -211,7 +380,38 @@ const saveEdit = () => {
             </div>
             <div class="space-y-1">
               <label class="block text-sm font-medium text-gray-700">Навыки</label>
-              <input v-model="item.body.skills" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+              <div class="mb-3 flex flex-wrap gap-2">
+            <span 
+              v-for="addSkill in skillsArray"
+              :key="addSkill"
+              class="inline-flex items-center rounded-md border border-purple-200 bg-purple-50 px-3 py-1 text-sm text-purple-800 hover:bg-purple-100"
+            >
+              {{ addSkill }}
+              <button 
+                @click="removeSkills(addSkill)"
+                class="ml-2 text-purple-500 hover:text-purple-700 text-base"
+              >
+                &times;
+              </button>
+            </span>
+          </div>
+          <input v-model="skillsInput" @keyup.enter="pushSkills(skillsInput)" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"/>
+            <div class="mt-3 max-h-[200px] overflow-y-auto">
+            <div class="flex flex-wrap gap-2">
+              <span 
+                @click="pushSkills(skill)"
+                v-for="skill in skillsArr.slice(0, 4)"
+                :key="skill"
+                class="inline-block rounded-md border border-purple-200 bg-purple-50 px-3 py-1 text-sm text-purple-800 hover:bg-purple-100 hover:cursor-pointer"
+              >
+                {{ skill }}
+              </span>
+              <div v-if="skillsArr.length == 0" class="w-full py-2 text-sm text-gray-500">
+                <p>Увы, ничего не найдено, минус вайб</p>
+                <p>Нажмите Enter, чтобы скил появился в инпуте</p>
+              </div>
+            </div>
+          </div>
             </div>
             <div class="space-y-1">
               <label class="block text-sm font-medium text-gray-700">Образование</label>

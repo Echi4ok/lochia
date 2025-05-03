@@ -220,7 +220,7 @@ let skillsArr = [
 ]
 
 let copySkillsArr = [...skillsArr];
-let copyInputSkillsArr = ref([...skillsInput.value])
+
 
 const searchingSkills = () => {
   // skillsArr = [...copySkillsArr]

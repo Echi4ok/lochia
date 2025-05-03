@@ -21,6 +21,8 @@ export interface InternBody {
 }
 
 export const useInternStore = defineStore('interns', () => {
+let skillsList = ref<Array<string>>([]);
+
   let internsArr = ref<Intern[]>([]);
   let setFilters = reactive({});
   let setPagination = reactive({
@@ -192,10 +194,33 @@ export const useInternStore = defineStore('interns', () => {
     }
   };
 
+
+  function getSkillsList(id: string) {
+    axios.get(`${API_BASE_URL}/candidates/skills`)
+    .then((res) => {
+      skillsList.value = [...res.data] // по идее так, но надо посмотреть какой json приходит 
+      alert.show('Кандидат успешно удален', { 
+        type: 'success',
+        title: 'Успешно',
+        buttonText: 'Отлично'
+      });
+    }).catch((e) => {
+      const errorMessage = e.response?.data?.message || 'Не удалось удалить кандидата';
+      alert.show(errorMessage, { 
+        type: 'error',
+        title: 'Ошибка удаления',
+        buttonText: 'Закрыть'
+      });
+      console.error('Ошибка при удалении:', e.message);
+      throw e;
+    });
+  }
+
   onMounted(getInterns);
   
   return { 
     getInterns, 
+    skillsList,
     internsArr, 
     setFilters,
     setPagination,
@@ -208,5 +233,6 @@ export const useInternStore = defineStore('interns', () => {
     getSort,
     exportInterns,
     importInterns,
+    getSkillsList
   }
 });
