@@ -195,17 +195,17 @@ let skillsList = ref<Array<string>>([]);
   };
 
 
-  function getSkillsList(id: string) {
+  function getSkillsList() {
     axios.get(`${API_BASE_URL}/candidates/skills`)
     .then((res) => {
       skillsList.value = [...res.data] // по идее так, но надо посмотреть какой json приходит 
-      alert.show('Кандидат успешно удален', { 
+      alert.show('Успешно получен массив скиллов', { 
         type: 'success',
         title: 'Успешно',
         buttonText: 'Отлично'
       });
     }).catch((e) => {
-      const errorMessage = e.response?.data?.message || 'Не удалось удалить кандидата';
+      const errorMessage = e.response?.data?.message || 'Массив скиллов не был получен';
       alert.show(errorMessage, { 
         type: 'error',
         title: 'Ошибка удаления',
@@ -217,6 +217,7 @@ let skillsList = ref<Array<string>>([]);
   }
 
   onMounted(getInterns);
+  
   
   return { 
     getInterns, 
