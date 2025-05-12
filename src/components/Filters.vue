@@ -144,6 +144,11 @@ const pushSkills = (skill: string) => {
   }
 };
 
+const removeSkills = (skill: string) => {
+skillsArray.value = skillsArray.value.filter((el) => {
+return el != skill
+})
+}
 
 </script>
 
