@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, watch, computed } from 'vue'
+import { reactive, ref, watch, computed, onMounted } from 'vue'
 import { useInternStore } from '@/stores/intern';
 import { useInternshipsStore } from '@/stores/internships'
 
@@ -96,175 +96,53 @@ const removeFilters = () => {
 }
 
 
-let skillsArr = [
-  "postgresql",
-  "minecraft",
-  "csgo",
-  "sql",
-  "javascript",
-  "sql python",
-  "python",
-  "java",
-  "golang",
-  "docker",
-  "git",
-  "react",
-  "go",
-  "kubernetes",
-  "ansible",
-  "linux",
-  "fastapi",
-  "django",
-  "graphql",
-  "flask",
-  "spring",
-  "node.js",
-  "express",
-  "typescript",
-  "html",
-  "css",
-  "sass",
-  "vue",
-  "angular",
-  "redux",
-  "mongodb",
-  "mysql",
-  "redis",
-  "aws",
-  "azure",
-  "gcp",
-  "terraform",
-  "jenkins",
-  "ci/cd",
-  "rest api",
-  "microservices",
-  "rabbitmq",
-  "kafka",
-  "elasticsearch",
-  "postman",
-  "swagger",
-  "nginx",
-  "apache",
-  "pandas",
-  "numpy",
-  "tensorflow",
-  "pytorch",
-  "machine learning",
-  "data science",
-  "big data",
-  "hadoop",
-  "spark",
-  "scala",
-  "rust",
-  "c++",
-  "c#",
-  ".net",
-  "php",
-  "laravel",
-  "ruby",
-  "rails",
-  "bash",
-  "powershell",
-  "solidity",
-  "blockchain",
-  "ethereum",
-  "smart contracts",
-  "figma",
-  "adobe xd",
-  "ui/ux design",
-  "photoshop",
-  "illustrator",
-  "premiere pro",
-  "after effects",
-  "blender",
-  "unity",
-  "unreal engine",
-  "arduino",
-  "raspberry pi",
-  "iot",
-  "cybersecurity",
-  "penetration testing",
-  "ethical hacking",
-  "network security",
-  "devops",
-  "agile",
-  "scrum",
-  "kanban",
-  "project management",
-  "jira",
-  "trello",
-  "slack",
-  "microsoft teams",
-  "zoom",
-  "google workspace",
-  "microsoft office",
-  "excel",
-  "power bi",
-  "tableau",
-  "data analysis",
-  "business intelligence",
-  "digital marketing",
-  "seo",
-  "content writing",
-  "technical writing",
-  "customer support",
-  "sales",
-  "negotiation",
-  "public speaking",
-  "leadership",
-  "team management",
-  "recruiting",
-  "human resources",
-  "accounting",
-  "finance",
-]
+const skillsArr = ref<string[]>([]);
+const copySkillsArr = ref<string[]>([]);
 
-let copySkillsArr = [...skillsArr];
+// Добавляем загрузку данных из хранилища
+onMounted(async () => {
+  await store.getSkillsList(); // Предполагаем, что это метод для загрузки skills
+  skillsArr.value = [...store.skillsList];
+  copySkillsArr.value = [...store.skillsList];
+});
 
+// Добавляем отслеживание изменений в хранилище
+watch(() => store.skillsList, (newSkills) => {
+  skillsArr.value = [...newSkills];
+  copySkillsArr.value = [...newSkills];
+});
 
+// Модифицируем searchingSkills
 const searchingSkills = () => {
-  // skillsArr = [...copySkillsArr]
-  if(skillsInput.value) {
-  skillsArr = skillsArr.filter((skill, idx) => {
-  return skillsInput.value.includes(skill.substring(0, count.value)) == true
-  })
-}
-}
+  if (skillsInput.value) {
+    skillsArr.value = copySkillsArr.value.filter((skill) => {
+      return skill.toLowerCase().includes(skillsInput.value.toLowerCase());
+    });
+  } else {
+    skillsArr.value = [...copySkillsArr.value];
+  }
+};
 
+// Обновляем watch для skillsInput
 watch(() => skillsInput.value, (newVal, oldVal) => {
-  console.log(newVal, oldVal)
-  
-  if(oldVal.length <= newVal.length) {
+  if (oldVal.length <= newVal.length) {
     count.value++;
   } else {
-    skillsArr = [...copySkillsArr]
+    skillsArr.value = [...copySkillsArr.value];
     count.value--;
   }
-  console.log(count.value)
-
   searchingSkills();
+});
 
-  console.log(skillsArr)
-})
-
-
+// Обновляем pushSkills
 const pushSkills = (skill: string) => {
-if(skillsInput.value || skill != '') {
-  skillsArray.value.push(skill);
-  skillsInput.value = '';
-  skillsArr = [...copySkillsArr]
-  count.value = 0;
-}
-  
-
-
-}
-
-const removeSkills = (skill: string) => {
-skillsArray.value = skillsArray.value.filter((el) => {
-return el !== skill;
-})
-}
+  if (skillsInput.value || skill !== '') {
+    skillsArray.value.push(skill);
+    skillsInput.value = '';
+    skillsArr.value = [...copySkillsArr.value];
+    count.value = 0;
+  }
+};
 
 
 </script>

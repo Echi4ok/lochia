@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, reactive, watch } from 'vue'
+import { computed, ref, reactive, watch, onMounted } from 'vue'
 import { useInternStore } from '@/stores/intern'
 import { useInternshipsStore } from '@/stores/internships'
 import type { Intern, Internship, InternBody, InternshipBody } from '../types/types'
@@ -11,135 +11,66 @@ const props = defineProps<{
   storeType: 'intern' | 'internship'
 }>()
 
-// Определяем нужное хранилище
 const store = props.storeType === 'intern' ? useInternStore() : useInternshipsStore()
-let skillsArr = [
-  "postgresql",
-  "minecraft",
-  "csgo",
-  "sql",
-  "javascript",
-  "sql python",
-  "python",
-  "java",
-  "golang",
-  "docker",
-  "git",
-  "react",
-  "go",
-  "kubernetes",
-  "ansible",
-  "linux",
-  "fastapi",
-  "django",
-  "graphql",
-  "flask",
-  "spring",
-  "node.js",
-  "express",
-  "typescript",
-  "html",
-  "css",
-  "sass",
-  "vue",
-  "angular",
-  "redux",
-  "mongodb",
-  "mysql",
-  "redis",
-  "aws",
-  "azure",
-  "gcp",
-  "terraform",
-  "jenkins",
-  "ci/cd",
-  "rest api",
-  "microservices",
-  "rabbitmq",
-  "kafka",
-  "elasticsearch",
-  "postman",
-  "swagger",
-  "nginx",
-  "apache",
-  "pandas",
-  "numpy",
-  "tensorflow",
-  "pytorch",
-  "machine learning",
-  "data science",
-  "big data",
-  "hadoop",
-  "spark",
-  "scala",
-  "rust",
-  "c++",
-  "c#",
-  ".net",
-  "php",
-  "laravel",
-  "ruby",
-  "rails",
-  "bash",
-  "powershell",
-  "solidity",
-  "blockchain",
-  "ethereum",
-  "smart contracts",
-  "figma",
-  "adobe xd",
-  "ui/ux design",
-  "photoshop",
-  "illustrator",
-  "premiere pro",
-  "after effects",
-  "blender",
-  "unity",
-  "unreal engine",
-  "arduino",
-  "raspberry pi",
-  "iot",
-  "cybersecurity",
-  "penetration testing",
-  "ethical hacking",
-  "network security",
-  "devops",
-  "agile",
-  "scrum",
-  "kanban",
-  "project management",
-  "jira",
-  "trello",
-  "slack",
-  "microsoft teams",
-  "zoom",
-  "google workspace",
-  "microsoft office",
-  "excel",
-  "power bi",
-  "tableau",
-  "data analysis",
-  "business intelligence",
-  "digital marketing",
-  "seo",
-  "content writing",
-  "technical writing",
-  "customer support",
-  "sales",
-  "negotiation",
-  "public speaking",
-  "leadership",
-  "team management",
-  "recruiting",
-  "human resources",
-  "accounting",
-  "finance",
-]
-const skillsArray = ref([])
-let skillsInput = ref('')
-let count = ref(0);
-let copySkillsArr = [...skillsArr]
-// Шаблон нового элемента в зависимости от типа
+
+// Реактивные переменные для работы с навыками
+const skillsArr = ref<string[]>([])
+const copySkillsArr = ref<string[]>([])
+const skillsArray = ref<string[]>([])
+const skillsInput = ref('')
+const count = ref(0)
+
+// Загрузка навыков из хранилища
+onMounted(async () => {
+  if (props.storeType === 'intern') {
+    await store.getSkillsList() // Загружаем навыки из API
+    skillsArr.value = [...store.skillsList]
+    copySkillsArr.value = [...store.skillsList]
+  }
+})
+
+// Следим за изменениями в хранилище
+watch(() => store.skillsList, (newSkills) => {
+  skillsArr.value = [...newSkills]
+  copySkillsArr.value = [...newSkills]
+}, { immediate: true })
+
+// Функции работы с навыками
+const searchingSkills = () => {
+  if (skillsInput.value) {
+    skillsArr.value = copySkillsArr.value.filter((skill) => {
+      return skill.toLowerCase().includes(
+        skillsInput.value.toLowerCase().substring(0, count.value)
+      )
+    })
+  }
+}
+
+const pushSkills = (skill: string) => {
+  const trimmedSkill = skill.trim()
+  if (trimmedSkill && !skillsArray.value.includes(trimmedSkill)) {
+    skillsArray.value.push(trimmedSkill)
+    skillsInput.value = ''
+    skillsArr.value = [...copySkillsArr.value]
+    count.value = 0
+  }
+}
+
+const removeSkills = (skill: string) => {
+  skillsArray.value = skillsArray.value.filter(el => el !== skill)
+}
+
+watch(() => skillsInput.value, (newVal, oldVal) => {
+  if (oldVal.length <= newVal.length) {
+    count.value++
+  } else {
+    skillsArr.value = [...copySkillsArr.value]
+    count.value--
+  }
+  searchingSkills()
+})
+
+// Остальной код остается без изменений
 const getEmptyItem = () => {
   if (props.storeType === 'intern') {
     return reactive({
@@ -175,35 +106,31 @@ const getEmptyItem = () => {
 
 const item = computed(() => {
   if (props.itemId === undefined) {
-    isEdit.value = true;
-    return getEmptyItem();
+    isEdit.value = true
+    return getEmptyItem()
   }
-  const foundItem = props.items.find(t => t.id === props.itemId);
+  const foundItem = props.items.find(t => t.id === props.itemId)
   if (foundItem) {
-    employmentTypesArr.value = foundItem.body.employmentType.split(',').map(s => s.trim());
-    skillsArray.value = [...foundItem.body.skills.split(',')]
+    employmentTypesArr.value = foundItem.body.employmentType.split(',').map(s => s.trim())
+    skillsArray.value = [...foundItem.body.skills.split(',').map(s => s.trim())]
   }
-  return foundItem;
-});
+  return foundItem
+})
 
 const isEdit = ref(false)
 const copyItemObj = reactive({})
-const employmentTypesArr = ref<string[]>([]);
+const employmentTypesArr = ref<string[]>([])
 
 const employmentTypes = computed({
-  get: () => {
-    return employmentTypesArr.value;
-  },
+  get: () => employmentTypesArr.value,
   set: (newValue: string[]) => {
-    employmentTypesArr.value = newValue;
+    employmentTypesArr.value = newValue
     if (item.value) {
-      item.value.body.employmentType = newValue.join(', ');
+      item.value.body.employmentType = newValue.join(', ')
     }
   }
-});
+})
 
-
-console.log(item.value?.body.employmentType.split(','))
 const editMode = () => {
   if (item.value) {
     Object.assign(copyItemObj, JSON.parse(JSON.stringify(item.value)))
@@ -225,61 +152,16 @@ const deleteItem = (id: string) => {
   props.isShowingWindow()
 }
 
-
-
 const saveEdit = () => {
-  // item.value.body.employmentType = employmentTypesArr.value.join(',')
-
   if (props.itemId == undefined) {
     store.postIntern(item.value.body)
   } else {
-    item.value.body.skills = skillsArray.value.join(', ');
+    item.value.body.skills = skillsArray.value.join(', ')
     store.patchIntern(props.itemId, item.value.body)
   }
   props.isShowingWindow()
   isEdit.value = false
 }
-
-
-const searchingSkills = () => {
-  if(skillsInput.value) {
-  skillsArr = skillsArr.filter((skill, idx) => {
-  return skillsInput.value.includes(skill.substring(0, count.value)) == true
-  })
-}
-}
-
-const pushSkills = (skill: string) => {
-skillsArray.value.push(skill);
-skillsInput.value = '';
-skillsArr = [...copySkillsArr]
-  count.value = 0;
-}
-
-const removeSkills = (skill: string) => {
-skillsArray.value = skillsArray.value.filter((el) => {
-return el != skill;
-})
-}
-
-watch(() => skillsInput.value, (newVal, oldVal) => {
-  console.log(newVal, oldVal)
-  
-  if(oldVal.length <= newVal.length) {
-    count.value++;
-  } else {
-    skillsArr = [...copySkillsArr]
-    count.value--;
-  }
-  console.log(count.value)
-
-  searchingSkills();
-
-  console.log(skillsArr)
-})
-
-
-
 </script>
 
 <template>
